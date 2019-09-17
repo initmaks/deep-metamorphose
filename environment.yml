@@ -14,6 +14,8 @@ dependencies:
   - libffi=3.2.1
   - libiconv=1.15
   - libpng=1.6.36
+  - matplotlib
+  - numpy
   - ncurses=6.1
   - nettle=3.4.1
   - openh264=1.8.0
@@ -44,7 +46,6 @@ dependencies:
     - kiwisolver==1.0.1
     - lockfile==0.12.2
     - markupsafe==1.1.1
-    - matplotlib==3.0.2
     - mistune==0.8.4
     - more-itertools==5.0.0
     - mpi4py==3.0.0
@@ -53,7 +54,6 @@ dependencies:
     - netifaces==0.10.9
     - networkx==2.2
     - notebook==5.7.8
-    - numpy==1.16.1
     - nvidia-ml-py3==7.352.0
     - pandas==0.24.1
     - pandocfilters==1.4.2
