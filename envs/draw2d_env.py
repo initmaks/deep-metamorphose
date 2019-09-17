@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
+def rgb2gray(rgb):
+    return np.dot(rgb[...,:3], [0.2989, 0.5870, 0.1140])
+
 class Draw2DEnv(Env):
     metadata = {'render.modes': ['rgb_array']}
     reward_range = (-float('inf'), float('inf'))
@@ -31,12 +34,16 @@ class Draw2DEnv(Env):
         self.fig.canvas.draw()
         byte_string = self.fig.canvas.tostring_rgb()
         current_img = np.fromstring(byte_string, dtype='uint8').reshape(self.H, self.W, 3)
+        current_img = self.process_env_image(current_img)
 
         o = current_img #TODO add image
         r = 0.0 #TODO extract and compare pictures
         d = False # never perfect
         i = {}
         return o,r,d,i
+
+    def process_env_image(self, img):
+        return rgb2gray(img/255)
 
     def reset_plot(self):
         self.ax.clear()
@@ -46,9 +53,8 @@ class Draw2DEnv(Env):
 
     def reset(self):
         self.reset_plot()
-        
+        return np.zeros((self.W, self.H))
         # self.painted_image = MNIST.random_img TODO
-
 
     def render(self, mode='human'):
         raise NotImplementedError
