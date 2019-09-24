@@ -5,12 +5,14 @@ from imageio import imwrite
 import envs
 
 if __name__ == '__main__':
-    env = gym.make('Draw2D-v0')
+    env = gym.make('Draw2D-v0',cuda=False)
     c = 0
-    o, d = env.reset(), False
-    while not d:
-        c+=1
-        a = np.random.rand(2)
-        o,r,d,i = env.step(a)
-    imwrite(f'test_imgs/{c}.png', o)
-    print(c, d)
+    for rollout_i in range(2):
+        o, d = env.reset(), False
+        while not d:
+            c+=1
+            a = np.random.rand(2)
+            o,r,d,i = env.step(a)
+            #d = i['is_success']
+        imwrite(f'test_imgs/{c}_i.png', o[0])
+        print(c, d)
