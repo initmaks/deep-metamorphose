@@ -30,8 +30,8 @@ class Experiment():
                               and self.config['cuda'] is not None else "cpu")
         self.config['learner_kwargs']['device'] = device
 
-        self.env = gym.make(config['env_name'])
-        self.test_env = gym.make(config['env_name'])
+        self.env = gym.make(config['env_name'], cuda = self.config['cuda'])
+        self.test_env = gym.make(config['env_name'], cuda = self.config['cuda'])
 
         self.set_seed(config['seed'])
         
