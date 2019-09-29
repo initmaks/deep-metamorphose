@@ -26,8 +26,8 @@ def rgb2gray(rgb):
 class Draw2DEnv(Env):
     metadata = {'render.modes': ['rgb_array']}
     reward_range = (-float('inf'), float('inf'))
-    def __init__(self, cuda=True):
-        self.device = torch.device(f"cuda:{cuda}" if torch.cuda.is_available() else "cpu")
+    def __init__(self, cuda=None):
+        self.device = torch.device(f"cuda:{cuda}" if (cuda and torch.cuda.is_available()) else "cpu")
         self.loss = VGGFeatureLoss().to(self.device)
         self.action_space = Box(low=-1.0, high=1.0, shape=(2, ), dtype=np.float32)
         self.fig = plt.figure(figsize=(2,2))
