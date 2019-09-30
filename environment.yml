@@ -6,7 +6,6 @@ dependencies:
   - bzip2=1.0.6
   - ca-certificates=2018.11.29
   - certifi=2018.11.29
-  - fastai
   - ffmpeg=4.1
   - freetype=2.9.1
   - gmp=6.1.2
