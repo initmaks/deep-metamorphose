@@ -1,0 +1,34 @@
+# Hardware Setup
+cpu_workers: 6
+cuda: 0
+seed: # blank == random
+
+# Environment
+exp_type: ImageExperiment
+env_name: Draw2D-v0
+max_ep_len: 30
+
+# Algorithm
+algo: TD3_CNN
+learner_kwargs:
+    gamma: 0.95
+    polyak: 0.9995 
+    batch_size: 1408
+    q_lr: 0.001
+    pi_lr: 0.001
+    ac_kwargs:
+        cnn_arch: 'MN3_small'
+        hidden_sizes: [256,256,256]
+
+# Experiment
+epochs: 200
+env_steps_per_epoch: 4500
+train_steps_per_rollout: 10
+exploration_steps: 20000
+replay_size: 100000
+save_epoch_freq: 5
+
+# Logger
+logger_kwargs:
+    exp_name: "baseline"
+    project_name: 'morph2d'
