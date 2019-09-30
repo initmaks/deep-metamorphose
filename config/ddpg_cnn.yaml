@@ -13,7 +13,7 @@ algo: DDPG_CNN
 learner_kwargs:
     gamma: 0.95
     polyak: 0.9995 
-    batch_size: 1408
+    batch_size: 896
     q_lr: 0.001
     pi_lr: 0.001
     ac_kwargs:
