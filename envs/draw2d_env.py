@@ -53,7 +53,7 @@ class Draw2DEnv(Env):
         self.fig.canvas.draw()
         byte_string = self.fig.canvas.tostring_rgb()
         current_img = np.fromstring(byte_string, dtype='uint8').reshape(self.H, self.W, 3)
-        current_img = resize(current_img, (self.h, self.w, 3))
+        current_img = resize(current_img, (self.h, self.w))
         current_img = make_channel_first(current_img)
         o = (current_img, self.goal_img) #TODO add cursor position?
 
@@ -77,9 +77,11 @@ class Draw2DEnv(Env):
     def reset(self):
         self.reset_plot()
         # i = 20 # TODO make it random, static now for debugging.
-        # img_sample = self.ds_X[i].reshape(28,28)/255.
-        img_sample = np.load('4.npy')
-        self.goal_img = resize(255. - img_sample, (1, self.h, self.w))
+        # img_sample = self.ds_X[i].reshape(28,28)
+        img_sample = 1. - (np.load('4.npy')/255.)
+        self.goal_img = resize(img_sample, (self.h, self.w))
+        import matplotlib.pyplot as plt
+        self.goal_img = np.expand_dims(self.goal_img,0)
         self.goal_img = np.concatenate([self.goal_img] * 3, axis=0)
         return (np.zeros((3, self.h, self.w)), self.goal_img)
 
