@@ -32,13 +32,8 @@ class Draw2DEnv(Env):
         self.device = torch.device(f"cuda:{cuda}" if (cuda and torch.cuda.is_available()) else "cpu")
         self.loss = VGGFeatureLoss().to(self.device)
         self.action_space = Box(low=-1.0, high=1.0, shape=(2, ), dtype=np.float32)
-        self.fig_id = str(uuid.uuid4())
-        self.fig = plt.figure(num=self.fig_id, figsize=(2,2))
-        self.ax = Axes3D(self.fig)
-        self.ax.view_init(elev=0., azim=0.0) # rotate camera
-        self.ax.dist = 6.2
-        self.W, self.H = self.fig.canvas.get_width_height()
-        self.w, self.h = 64, 64
+        self.fig_id = None
+        self.reset_plot()
         # self.ds_X, self.ds_y = datasets.fetch_openml('mnist_784', version=1, return_X_y=True,
         #                                              data_home='mnist_cache', cache=True)
 
@@ -72,7 +67,14 @@ class Draw2DEnv(Env):
         return make_channel_first(img) # rgb2gray(img/255)
 
     def reset_plot(self):
-        self.ax.clear()
+        if self.fig_id is not None: self.fig.close()
+        self.fig_id = str(uuid.uuid4())
+        self.fig = plt.figure(num=self.fig_id, figsize=(2,2))
+        self.ax = Axes3D(self.fig)
+        self.ax.view_init(elev=0., azim=0.0) # rotate camera
+        self.ax.dist = 6.2
+        self.W, self.H = self.fig.canvas.get_width_height()
+        self.w, self.h = 64, 64
         self.ax.set_xlim3d(0,1)
         self.ax.set_ylim3d(0,1)
         self.ax.set_zlim3d(0,1)
