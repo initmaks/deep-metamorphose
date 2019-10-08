@@ -149,7 +149,7 @@ class Experiment():
                 ep_len += 1
                 if j < runs_to_record:
                     i1,i2 = make_channel_last(o[0]), make_channel_last(o[1])
-                    rend_img = np.concatenate([i1,i2],axis=1)gd boostup/algos/ddpg/ddpg_cnn.py
+                    rend_img = np.concatenate([i1,i2],axis=1)
                     img_list.append([plt.imshow(rend_img, animated=True)])
             self.logger.store(TestEpRet=ep_ret, TestEpLen=ep_len)
         if img_list:
