@@ -28,7 +28,7 @@ class Experiment():
         self.device = torch.device(f"cuda:{self.config['cuda']}"
                                    if torch.cuda.is_available()
                                    and self.config['cuda'] is not None else "cpu")
-        self.config['learner_kwargs']['device'] = device
+        self.config['learner_kwargs']['device'] = self.device
 
         self.env = gym.make(config['env_name'], cuda = self.config['cuda'])
         self.test_env = gym.make(config['env_name'], cuda = self.config['cuda'])
