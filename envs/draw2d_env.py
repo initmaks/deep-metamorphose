@@ -67,7 +67,7 @@ class Draw2DEnv(Env):
         return make_channel_first(img) # rgb2gray(img/255)
 
     def reset_plot(self):
-        if self.fig_id is not None: self.fig.close()
+        if self.fig_id is not None: plt.close(self.fig_id)
         self.fig_id = str(uuid.uuid4())
         self.fig = plt.figure(num=self.fig_id, figsize=(2,2))
         self.ax = Axes3D(self.fig)
