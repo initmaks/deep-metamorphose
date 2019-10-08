@@ -79,6 +79,7 @@ class Experiment():
         self.buffer = ReplayBuffer(obs_dim=obs_dim, act_dim=act_dim, size=self.config['replay_size'])
 
     def init_learner(self, learner_fn):
+        self.config['learner_kwargs']['lsuv_data'] = self.get_lsuv_data()
         self.config['learner_kwargs']['ac_kwargs']['state_sample'] = self.sample_obs
         self.config['learner_kwargs']['action_space'] = self.env.action_space
         learner = learner_fn(**self.config['learner_kwargs'])
@@ -148,7 +149,7 @@ class Experiment():
                 ep_len += 1
                 if j < runs_to_record:
                     i1,i2 = make_channel_last(o[0]), make_channel_last(o[1])
-                    rend_img = np.concatenate([i1,i2],axis=1)
+                    rend_img = np.concatenate([i1,i2],axis=1)gd boostup/algos/ddpg/ddpg_cnn.py
                     img_list.append([plt.imshow(rend_img, animated=True)])
             self.logger.store(TestEpRet=ep_ret, TestEpLen=ep_len)
         if img_list:
@@ -219,6 +220,20 @@ class ImageExperiment(Experiment):
                                            size=self.config['replay_size'],
                                            img_size=img.shape,
                                            n_cpus=self.config['cpu_workers'])
+
+    def get_lsuv_data(self,):
+        data1,data2 = [],[]
+        for _ in range(20):
+            o,r,d,i = self.env.reset()
+            while not d:
+                a = self.env.unwrapped.sample_action()
+                o,r,d,i = self.env.step(a)
+                im1, im2 = o
+                data1.append(im1)
+                data2.append(im2)
+        data1 = from_numpy(np.array(data1)).float().to(self.device)
+        data2 = from_numpy(np.array(data2)).float().to(self.device)
+        return (data1, data2)
 
 class OffPolicyImageExperiment(ImageExperiment):
     def setup_buffer(self):

@@ -1,152 +1,187 @@
-# credits https://github.com/ducha-aiki/LSUV-pytorch/
+#Credit https://github.com/shunk031/LSUV.pytorch
 import numpy as np
 import torch
-import torch.nn.init
 import torch.nn as nn
+from torch.utils.data import DataLoader
 
-gg = {}
-gg['hook_position'] = 0
-gg['total_fc_conv_layers'] = 0
-gg['done_counter'] = -1
-gg['hook'] = None
-gg['act_dict'] = {}
-gg['counter_to_apply_correction'] = 0
-gg['correction_needed'] = False
-gg['current_coef'] = 1.0
+def is_bad_std(std_val):
+    return std_val==0.0 or not np.isfinite(std_val)
 
-# Orthonorm init code is taked from Lasagne
-# https://github.com/Lasagne/Lasagne/blob/master/lasagne/init.py
-def svd_orthonormal(w):
-    shape = w.shape
-    if len(shape) < 2:
-        raise RuntimeError("Only shapes of length 2 or more are supported.")
-    flat_shape = (shape[0], np.prod(shape[1:]))
-    a = np.random.normal(0.0, 1.0, flat_shape)#w;
-    u, _, v = np.linalg.svd(a, full_matrices=False)
-    q = u if u.shape == flat_shape else v
-    print (shape, flat_shape)
-    q = q.reshape(shape)
-    return q.astype(np.float32)
+class LSUVInit(object):
 
-def store_activations(self, input, output):
-    gg['act_dict'] = output.data.cpu().numpy();
-    #print('act shape = ', gg['act_dict'].shape)
-    return
+    def __init__(self,
+                 model: nn.Module,
+                 data_loader: DataLoader,
+                 needed_std: float = 1.0,
+                 std_tol: float = 0.1,
+                 max_attempts: int = 10,
+                 do_orthonorm: bool = True,
+                 device: torch.device = 'str') -> None:
+        self._model = model
+        self.data_loader = data_loader
+        self.needed_std = needed_std
+        self.std_tol = std_tol
+        self.max_attempts = max_attempts
+        self.do_orthonorm = do_orthonorm
+        self.device = device
 
+        self.eps = 1e-8
+        self.hook_position = 0
+        self.total_fc_conv_layers = 0
+        self.done_counter = -1
+        self.hook = None
+        self.act_dict: np.ndarray = None
+        self.counter_to_apply_correction = 0
+        self.correction_needed = False
+        self.reinit_needed = False
+        self.current_coef = 1.0
 
-def add_current_hook(m):
-    if gg['hook'] is not None:
-        return
-    if (isinstance(m, nn.Conv2d)) or (isinstance(m, nn.Linear)):
-        #print 'trying to hook to', m, gg['hook_position'], gg['done_counter']
-        if gg['hook_position'] > gg['done_counter']:
-            gg['hook'] = m.register_forward_hook(store_activations)
-            #print ' hooking layer = ', gg['hook_position'], m
-        else:
-            #print m, 'already done, skipping'
-            gg['hook_position'] += 1
-    return
+    def svd_orthonormal(self, w: np.ndarray) -> np.ndarray:
+        shape = w.shape
+        if len(shape) < 2:
+            raise RuntimeError("Only shapes of length 2 or more are supported.")
+        flat_shape = (shape[0], np.prod(shape[1:]))
+        a = np.random.normal(0.0, 1.0, flat_shape)  # w;
+        u, _, v = np.linalg.svd(a, full_matrices=False)
+        q = u if u.shape == flat_shape else v
+        print(shape, flat_shape)
+        q = q.reshape(shape)
+        return q.astype(np.float32)
 
-def count_conv_fc_layers(m):
-    if (isinstance(m, nn.Conv2d)) or (isinstance(m, nn.Linear)):
-        gg['total_fc_conv_layers'] +=1
-    return
+    def count_conv_fc_layers(self, m: nn.Module) -> None:
+        if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+            self.total_fc_conv_layers += 1
 
-def remove_hooks(hooks):
-    for h in hooks:
-        h.remove()
-    return
-
-def orthogonal_weights_init(m):
-    if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-        if hasattr(m, 'weight_v'):
-            w_ortho = svd_orthonormal(m.weight_v.data.cpu().numpy())
-            m.weight_v.data = torch.from_numpy(w_ortho)
-            try:
-                nn.init.constant(m.bias, 0)
-            except:
-                pass
-        else:
-            #nn.init.orthogonal(m.weight)
-            w_ortho = svd_orthonormal(m.weight.data.cpu().numpy())
-            #print w_ortho 
-            #m.weight.data.copy_(torch.from_numpy(w_ortho))
-            m.weight.data = torch.from_numpy(w_ortho)
-            try:
-                nn.init.constant(m.bias, 0)
-            except:
-                pass
-    return
-
-def apply_weights_correction(m):
-    if gg['hook'] is None:
-        return
-    if not gg['correction_needed']:
-        return
-    if (isinstance(m, nn.Conv2d)) or (isinstance(m, nn.Linear)):
-        if gg['counter_to_apply_correction'] < gg['hook_position']:
-            gg['counter_to_apply_correction'] += 1
-        else:
-            if hasattr(m, 'weight_g'):
-                m.weight_g.data *= float(gg['current_coef'])
-                #print m.weight_g.data
-                #print m.weight_v.data
-                #print 'weights norm after = ', m.weight.data.norm()
-                gg['correction_needed'] = False
+    def orthogonal_weights_init(self, m: nn.Module) -> None:
+        if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+            if hasattr(m, 'weight_v'):
+                w_ortho = self.svd_orthonormal(m.weight_v.data.cpu().numpy())
+                m.weight_v.data = torch.from_numpy(w_ortho)
+                try:
+                    nn.init.constant_(m.bias, 0.0)
+                except Exception:
+                    pass
             else:
-                #print 'weights norm before = ', m.weight.data.norm()
-                m.weight.data *= gg['current_coef']
-                #print 'weights norm after = ', m.weight.data.norm()
-                gg['correction_needed'] = False
-            return
-    return
+                w_ortho = self.svd_orthonormal(m.weight.data.cpu().numpy())
+                m.weight.data = torch.from_numpy(w_ortho)
+                try:
+                    nn.init.constant_(m.bias, 0.0)
+                except Exception:
+                    pass
 
-def LSUVinit(model,data, needed_std = 1.0, std_tol = 0.1, max_attempts = 10, do_orthonorm = True, cuda = False):
-    cuda = data.is_cuda
-    model.eval();
-    if cuda:
-        model = model.cuda()
-        data = data.cuda()
-    else:
-        model = model.cpu()
-        data = data.cpu() 
-    print( 'Starting LSUV')
-    model.apply(count_conv_fc_layers)
-    print ('Total layers to process:', gg['total_fc_conv_layers'])
-    if do_orthonorm:
-        model.apply(orthogonal_weights_init)
-        print ('Orthonorm done')
-        if cuda:
-            model = model.cuda()
-    for layer_idx in range(gg['total_fc_conv_layers']):
-        print (layer_idx)
-        model.apply(add_current_hook)
-        out = model(data)
-        current_std = gg['act_dict'].std()
-        print ('std at layer ',layer_idx, ' = ', current_std)
-        #print  gg['act_dict'].shape
-        attempts = 0
-        while (np.abs(current_std - needed_std) > std_tol):
-            gg['current_coef'] =  needed_std / (current_std  + 1e-8);
-            gg['correction_needed'] = True
-            model.apply(apply_weights_correction)
-            if cuda:
-                model = model.cuda()
-            out = model(data)
-            current_std = gg['act_dict'].std()
-            print ('std at layer ',layer_idx, ' = ', current_std, 'mean = ', gg['act_dict'].mean())
-            attempts+=1
-            if attempts > max_attempts:
-                print ('Cannot converge in ', max_attempts, 'iterations')
-                break
-        if gg['hook'] is not None:
-            gg['hook'].remove()
-        gg['done_counter']+=1
-        gg['counter_to_apply_correction'] = 0
-        gg['hook_position'] = 0
-        gg['hook']  = None
-        print ('finish at layer',layer_idx )
-    print ('LSUV init done!')
-    if not cuda:
-        model = model.cpu()
-    return model
+    def store_activations(self,
+                          module: nn.Module,
+                          data: torch.Tensor,
+                          output: torch.Tensor) -> None:
+        self.act_dict = output.detach().cpu().numpy()
+
+    def add_current_hook(self, m: nn.Module) -> None:
+        if self.hook is not None:
+            return
+        if (isinstance(m, nn.Conv2d)) or (isinstance(m, nn.Linear)):
+            if self.hook_position > self.done_counter:
+                self.hook = m.register_forward_hook(self.store_activations)
+            else:
+                self.hook_position += 1
+
+    def apply_weights_correction(self, m: nn.Module) -> None:
+        if self.hook is None:
+            return
+        if not self.correction_needed:
+            return
+        if (isinstance(m, nn.Conv2d)) or (isinstance(m, nn.Linear)):
+            if self.counter_to_apply_correction < self.hook_position:
+                self.counter_to_apply_correction += 1
+            else:
+                if self.reinit_needed:
+                    print('reinited!')
+                    print(m.weight)
+                    if hasattr(m, 'weight_v'):
+                        w_ortho = self.svd_orthonormal(m.weight_v.data.cpu().numpy())
+                        m.weight_v.data = torch.from_numpy(w_ortho)
+                        try:
+                            nn.init.constant_(m.bias, 0.0)
+                        except Exception:
+                            pass
+                    else:
+                        w_ortho = self.svd_orthonormal(m.weight.data.cpu().numpy())
+                        m.weight.data = torch.from_numpy(w_ortho)
+                        try:
+                            nn.init.constant_(m.bias, 0.0)
+                        except Exception:
+                            pass
+                    self.reinit_needed = False
+                    print(m.weight)
+                    return
+                if hasattr(m, 'weight_g'):
+                    m.weight_g.data *= float(self.current_coef)
+                    self.correction_needed = False
+                else:
+                    m.weight.data *= self.current_coef
+                    self.correction_needed = False
+
+    def initialize(self) -> nn.Module:
+        model = self._model
+        model.eval()
+
+        model.apply(self.count_conv_fc_layers)
+        if self.do_orthonorm:
+            model.apply(self.orthogonal_weights_init)
+
+        model = model.to(self.device)
+        for layer_idx in range(self.total_fc_conv_layers):
+            print(layer_idx)
+            model.apply(self.add_current_hook)
+            data = self.data_loader
+            if type(data) in [tuple, list]:
+                data = [d.to(self.device) for d in data]
+            else:
+                data = data.to(self.device)
+            model(data)
+            current_std = self.act_dict.std()
+            print('std at layer ', layer_idx, ' = ', current_std)
+
+            attempts = 0
+            prev_std = 123.123
+            while (np.abs(current_std - self.needed_std) > self.std_tol) or is_bad_std(current_std):
+                self.current_coef = self.needed_std / (current_std + self.eps)
+                self.correction_needed = True
+                model.apply(self.apply_weights_correction)
+
+                model = model.to(self.device)
+                model(data)
+                current_std = self.act_dict.std()
+                print('std at layer ', layer_idx, ' = ', current_std, 'mean = ', self.act_dict.mean())
+                if is_bad_std(current_std) or np.allclose(current_std, prev_std, atol=1e-08):
+                    self.reinit_needed = True
+                attempts += 1
+                if attempts > self.max_attempts:
+                    break
+                prev_std = current_std
+            
+            print('FINAL stats at layer ', layer_idx, ' = ', current_std, 'mean = ', self.act_dict.mean())
+
+            if self.hook is not None:
+                self.hook.remove()
+
+            self.done_counter += 1
+            self.counter_to_apply_correction = 0
+            self.hook_position = 0
+            self.hook = None
+            print('finish at layer', layer_idx)
+
+        print('LSUV init done!')
+        return model
+
+
+def lsuv_init(model: nn.Module,
+              data_loader: DataLoader,
+              needed_std: float,
+              std_tol: float,
+              max_attempts: int,
+              do_orthonorm: bool,
+              device: torch.device) -> nn.Module:
+
+    return LSUVInit(
+        model, data_loader, needed_std, std_tol,
+        max_attempts, do_orthonorm, device).initialize()

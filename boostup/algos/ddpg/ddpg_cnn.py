@@ -5,6 +5,7 @@ from torch import optim
 from boostup.algos.learner import Learner
 from boostup.utils.core import to_tensor
 from boostup.algos.ddpg import core
+from boostup.utils.lsuv import lsuv_init
 
 """
 
@@ -24,6 +25,7 @@ class DDPG_CNN(Learner):
                  noise_scale = 0.2,
                  batch_size=256,
                  ac_kwargs = {},
+                 lsuv_data = None
                  ):
         super(DDPG_CNN, self).__init__()
         self.device = device
@@ -36,6 +38,13 @@ class DDPG_CNN(Learner):
         
         ac_kwargs['action_space'] = action_space
         self.ac_main = core.ActorCriticCNN(**ac_kwargs).to(device)
+        self.ac_main = lsuv_init(self.ac_main,
+                                 lsuv_data,
+                                 needed_std=1.0,
+                                 std_tol=0.1,
+                                 max_attempts=10,
+                                 do_orthonorm=True,
+                                 device=device)
         self.ac_target = core.ActorCriticCNN(**ac_kwargs).to(device)
 
         self.pi_optimizer = optim.Adam([
