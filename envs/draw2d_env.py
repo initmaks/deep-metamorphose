@@ -1,3 +1,5 @@
+import uuid
+
 import torch
 from torch import from_numpy
 import numpy as np
@@ -30,7 +32,8 @@ class Draw2DEnv(Env):
         self.device = torch.device(f"cuda:{cuda}" if (cuda and torch.cuda.is_available()) else "cpu")
         self.loss = VGGFeatureLoss().to(self.device)
         self.action_space = Box(low=-1.0, high=1.0, shape=(2, ), dtype=np.float32)
-        self.fig = plt.figure(figsize=(2,2))
+        self.fig_id = str(uuid.uuid4())
+        self.fig = plt.figure(num=self.fig_id, figsize=(2,2))
         self.ax = Axes3D(self.fig)
         self.ax.view_init(elev=0., azim=0.0) # rotate camera
         self.ax.dist = 6.2
@@ -80,7 +83,6 @@ class Draw2DEnv(Env):
         # img_sample = self.ds_X[i].reshape(28,28)
         img_sample = 1. - (np.load('4.npy')/255.)
         self.goal_img = resize(img_sample, (self.h, self.w))
-        import matplotlib.pyplot as plt
         self.goal_img = np.expand_dims(self.goal_img,0)
         self.goal_img = np.concatenate([self.goal_img] * 3, axis=0)
         return (np.zeros((3, self.h, self.w)), self.goal_img)
