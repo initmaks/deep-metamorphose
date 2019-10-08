@@ -25,9 +25,9 @@ class Experiment():
         self.logger.save_config(config)
         
         self.config = config
-        device = torch.device(f"cuda:{self.config['cuda']}"
-                              if torch.cuda.is_available()
-                              and self.config['cuda'] is not None else "cpu")
+        self.device = torch.device(f"cuda:{self.config['cuda']}"
+                                   if torch.cuda.is_available()
+                                   and self.config['cuda'] is not None else "cpu")
         self.config['learner_kwargs']['device'] = device
 
         self.env = gym.make(config['env_name'], cuda = self.config['cuda'])
@@ -224,7 +224,7 @@ class ImageExperiment(Experiment):
     def get_lsuv_data(self,):
         data1,data2 = [],[]
         for _ in range(20):
-            o,r,d,i = self.env.reset()
+            o, d = self.env.reset(), False
             while not d:
                 a = self.env.unwrapped.sample_action()
                 o,r,d,i = self.env.step(a)
