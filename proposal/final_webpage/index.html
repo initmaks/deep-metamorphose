@@ -11,6 +11,12 @@
 <!-- Le styles -->  
   <link href="css/bootstrap.css" rel="stylesheet">
 <style>
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
 body {
 padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
@@ -43,12 +49,12 @@ color: #FF9900;
 
 <h3>Problem Statement:</h3>
 Inspiration for this project comes from the art work of Matthieu Robert-Ortis, the style of which the author has named <b>Métamorphose</b>.
-<iframe width="853" height="480" src="https://www.youtube.com/embed/PiYMol0VjWo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="840" height="460" src="https://www.youtube.com/embed/PiYMol0VjWo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <br>
 Anamorphosis is a distorted projection of an object that requires the viewer to use special devices, have a certain vantage point, or both, in order to properly view the object. Métamorphose builds upon this by combining two anamorphic objects.
 Generally speaking, from one vantage point the viewer sees one object, and from a different vantage point, he sees a second object.
 Some examples of this are the cover of Gödel, Escher, Bach: An Eternal Golden Braid by Douglas Hofstadter or the logo of the popular deep learning framework TensorFlow.
-<figure>
+<figure class="center">
 <img src="GEB.jpg" alt="Goedel Escher Bach" style="width:200px;height:200px;">
          
 <img src="TF.png" alt="Goedel Escher Bach" style="width:200px;height:200px;">
@@ -61,31 +67,42 @@ The goal of this project is to develop a model that takes two images as input an
 <!-- Approach -->
 <h3>Approach</h3>
 
-Since there does not exist a proper dataset for training such a model, a Reinforcement Learning (RL) algorithm will be used. In this case, a Convolutional Neural Network (CNN) will be trained to determine the policy of the RL agent. The agent will take as input the two original images along with a projection of each image from the previous iteration of training, as shown in Figure 1 below. Each image will pass through a CNN, which will share weights with the other three CNNs. Features from each of the four CNNs will be concatenated and fed into a policy network to produce an action, which could either be a blob/sphere of a certain size and color at a certain location or a line of a certain size and color.
-<h2> TODO Insert figure</h2>
+Since there does not exist a proper dataset for training such a model, a Reinforcement Learning (RL) algorithm will be used. In this case, a Convolutional Neural Network (CNN) will be trained to determine the policy of the RL agent. The agent will take as input the two original images along with a projection of each image from the previous iteration of training, as shown in the figure below. 
+<figure>
+    <img src="process.png" alt="process" style="width:800px;height:600px;" class="center">
+             
+  
+    <figcaption></figcaption>
+    </figure>
+    <br>
+Each image will pass through a CNN, which will share weights with the other three CNNs. Features from each of the four CNNs will be concatenated and fed into a policy network to produce an action, which could either be a blob/sphere of a certain size and color at a certain location or a line of a certain size and color.
+
 <br><br>
 <!-- Results -->
 <h3>Experiments and results</h3>
-Provide details about the experimental set up (number of images/videos, number of datasets you experimented with, train/test split if you used machine learning algorithms, etc.). Describe the evaluation metrics you used to evaluate how well your approach is working. Include clear figures and tables, as well as illustrative qualitative examples if appropriate. Be sure to include obvious baselines to see if your approach is doing better than a naive approach (e.g. for classification accuracy, how well would a classifier do that made random decisions?). Also discuss any parameters of your algorithms, and tell us how you set the values of those parameters. You can also show us how the performance varies as you change those parameter values. Be sure to discuss any trends you see in your results, and explain why these trends make sense. Are the results as expected? Why?
+The project will be broken into two parts: learning to draw in 2D and then extension to 3D.
+<br>
+<b>Tools:</b> Pytorch, Matplotlib (for 2d/3d rendering)
+<br><br>
+<b>List of experiments:</b>
+<ul>
+    <li>Overfitting to a single data sample - drawing in 2D</li>
+    <li>Training on MNIST dataset - drawing in 2D</li>
+    <li>Overfitting to a single data sample - drawing in 3D</li>
+    <li>Training on MNIST dataset - drawing in 3D</li>
+    <li>Training on larger, more difficult dataset (e.g KMNIST) - drawing in 3D (stretch goal)</li>
+  </ul>
 
+  <figure class = "center">
+      <img src="MNIST_eg.png" alt="mnist" style="width:250px;height:250px;">
+      <img src="kmnist.png" alt="kmnist" style="width:200px;height:200px;">
+               
+    
+      <figcaption>Sample images from the MNIST (left) and KMNIST datasets</figcaption>
+      </figure>
+      <br>
 <br><br>
 
-<!-- Main Results Figure --> 
-<div style="text-align: center;">
-<img style="height: 300px;" alt="" src="results.png">
-</div>
-<br><br>
-
-<!-- Results -->
-<h3>Qualitative results</h3>
-Show several visual examples of inputs/outputs of your system (success cases and failures) that help us better understand your approach.
-<br><br>
-
-<!-- Main Results Figure --> 
-<div style="text-align: center;">
-<img style="height: 300px;" alt="" src="qual_results.png">
-</div>
-<br><br>
 
 
 
