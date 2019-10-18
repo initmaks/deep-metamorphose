@@ -5,7 +5,7 @@ from torch import optim
 from boostup.algos.learner import Learner
 from boostup.utils.core import to_tensor
 from boostup.algos.td3 import core
-
+from boostup.utils.lsuv import lsuv_init
 
 """
 
@@ -28,6 +28,7 @@ class TD3_CNN(Learner):
                  target_noise=0.2,
                  batch_size=256,
                  ac_kwargs = {},
+                 lsuv_data = None
                  ):
         super(TD3_CNN, self).__init__()
         self.device = device
@@ -44,7 +45,13 @@ class TD3_CNN(Learner):
 
         ac_kwargs['action_space'] = action_space
         self.ac_main = core.ActorCriticCNN(**ac_kwargs).to(device)
-        #self.ac_main = LSUVinit(self.ac_main,data)
+        self.ac_main = lsuv_init(self.ac_main,
+                                 lsuv_data,
+                                 needed_std=1.0,
+                                 std_tol=0.1,
+                                 max_attempts=10,
+                                 do_orthonorm=True,
+                                 device=device)
         self.ac_target = core.ActorCriticCNN(**ac_kwargs).to(device)
 
         # Optimizers
@@ -141,10 +148,10 @@ class TD3_CNN(Learner):
     def get_action(self, obs, deterministic):
         self.eval()
         noise_scale = 0.0 if deterministic else self.noise_scale
-        state, img = obs
-        state = state.reshape(1,-1)
-        img = np.expand_dims(img,0)
-        ac_inp = (to_tensor(inp, self.device) for inp in [state, img])
+        img1, img2 = obs
+        img1 = np.expand_dims(img1,0)
+        img2 = np.expand_dims(img2,0)
+        ac_inp = (to_tensor(inp, self.device) for inp in [img1, img2])
         a = self.ac_main(ac_inp)
         a = a.cpu().detach().numpy()
         a += noise_scale * np.random.randn(self.act_dim)

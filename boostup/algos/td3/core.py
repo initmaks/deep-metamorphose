@@ -60,13 +60,13 @@ class ActorCriticCNN(nn.Module):
         self.cnn = load_cnn(name=cnn_arch)
         net_input =  self.cnn.output_size
 
-        self.policy = MLP(net_input + state_dim, list(hidden_sizes)+[act_dim], activation,
+        self.policy = MLP(net_input * 2, list(hidden_sizes)+[act_dim], activation,
                       output_activation, output_scaler=act_limit)
 
-        self.q1 = MLP(net_input + state_dim + act_dim, list(hidden_sizes)+[1], activation,
+        self.q1 = MLP((net_input * 2) + act_dim, list(hidden_sizes)+[1], activation,
                     output_activation=None, output_scaler=1.)
 
-        self.q2 = MLP(net_input + state_dim + act_dim, list(hidden_sizes)+[1], activation,
+        self.q2 = MLP((net_input * 2) + act_dim, list(hidden_sizes)+[1], activation,
                     output_activation=None, output_scaler=1.)
 
         if cnn_freeze:
@@ -74,15 +74,15 @@ class ActorCriticCNN(nn.Module):
             for param in self.cnn.parameters():
                 param.requires_grad = False
 
-
     def forward(self, x, a = None):
-        state, img = x
-        features = self.cnn(img)
-        pi = self.policy(torch.cat([features.detach(), state], dim=1))
+        img1, img2 = x
+        f1 = self.cnn(img1)
+        f2 = self.cnn(img2)
+        pi = self.policy(torch.cat([f1.detach(), f2.detach()], dim=1))
         if a is None:
             return pi
         else:
-            q1 = self.q1(torch.cat([features, state, a],dim=1))
-            q2 = self.q2(torch.cat([features, state, a],dim=1))
-            q1_pi = self.q1(torch.cat([features.detach(), state, pi],dim=1))
+            q1 = self.q1(torch.cat([f1, f2, a],dim=1))
+            q2 = self.q2(torch.cat([f1, f2, a],dim=1))
+            q1_pi = self.q1(torch.cat([f1.detach(), f2.detach(), pi],dim=1))
             return pi, q1, q2, q1_pi

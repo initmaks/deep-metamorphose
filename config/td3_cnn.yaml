@@ -12,10 +12,11 @@ max_ep_len: 30
 algo: TD3_CNN
 learner_kwargs:
     gamma: 0.95
-    polyak: 0.9995 
-    batch_size: 1408
-    q_lr: 0.001
-    pi_lr: 0.001
+    polyak: 0.995 
+    batch_size: 32
+    q_lr: 0.0001
+    pi_lr: 0.0001
+    cnn_lr: 0.0001
     ac_kwargs:
         cnn_arch: 'MN3_small'
         hidden_sizes: [256,256,256]
@@ -30,5 +31,5 @@ save_epoch_freq: 5
 
 # Logger
 logger_kwargs:
-    exp_name: "baseline"
+    exp_name: "test_env"
     project_name: 'morph2d'
