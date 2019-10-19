@@ -13,7 +13,7 @@ algo: TD3_CNN
 learner_kwargs:
     gamma: 0.95
     polyak: 0.995 
-    batch_size: 2048
+    batch_size: 896
     q_lr: 0.0001
     pi_lr: 0.0001
     cnn_lr: 0.0001
