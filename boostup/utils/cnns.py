@@ -252,7 +252,6 @@ class AddCoords(nn.Module):
 
         return ret
 
-
 class CoordConv(nn.Module):
     def __init__(self, in_channels, out_channels, with_r=False, **kwargs):
         super().__init__()
@@ -268,17 +267,23 @@ class CoordConv(nn.Module):
         return ret
 
 class CustomNet(nn.Module):
-    def __init__(self, num_outputs=256, net_type='100'):
+    def __init__(self, net_type='medium', use_coord_conv = False):
         super(CustomNet, self).__init__()
-        self.output_size = num_outputs
-        if net_type == '100':
-            filters = [16,32,64,4096]
-        if net_type == '50':
-            filters = [8,16,32,2048]
-        if net_type == '25':
-            filters = [4,8,16,1024]
+        if net_type == 'large':
+            filters = [32,64,128,1024]
+        if net_type == 'medium':
+            filters = [16,32,64,512]
+        if net_type == 'small':
+            filters = [8,16,32,256]
+        self.output_size = filters[-1]
+
+        if use_coord_conv:
+            first_conv = CoordConv(3, filters[0], kernel_size=5, stride=1, padding=2, with_r=True)
+        else:
+            first_conv = nn.Conv2d(3, filters[0], kernel_size=5, stride=1, padding=2)
+
         self.layer1 = nn.Sequential(
-            nn.Conv2d(3, filters[0], kernel_size=5, stride=1, padding=2),
+            first_conv,
             nn.BatchNorm2d(filters[0]),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2))
@@ -290,52 +295,25 @@ class CustomNet(nn.Module):
         self.layer3 = nn.Sequential(
             nn.Conv2d(filters[1], filters[2], kernel_size=5, stride=2, padding=2),
             nn.BatchNorm2d(filters[2]),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
-        self.fc = nn.Linear(filters[-1], num_outputs)
+            nn.ReLU())
+        self.avgpool = nn.AdaptiveAvgPool2d(2)
+        self.fc = nn.Linear(filters[-2]*4, self.output_size)
 
     def forward(self, x):
         out = self.layer1(x)
         out = self.layer2(out)
         out = self.layer3(out)
+        out = self.avgpool(out)
         out = out.reshape(out.size(0), -1)
         out = self.fc(out)
         return out
-
-class CustomNetCoord(nn.Module):
-    def __init__(self, num_outputs=256):
-        super(CustomNetCoord, self).__init__()
-        self.output_size = num_outputs
-        self.layer1 = nn.Sequential(
-            CoordConv(3, 16, kernel_size=5, stride=1, padding=2, with_r=True),
-            nn.BatchNorm2d(16),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
-        self.layer2 = nn.Sequential(
-            nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2),
-            nn.BatchNorm2d(32),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
-        self.layer3 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=5, stride=2, padding=2),
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
-        self.fc = nn.Linear(4096, num_outputs)
-
-    def forward(self, x):
-        out = self.layer1(x)
-        out = self.layer2(out)
-        out = self.layer3(out)
-        out = out.reshape(out.size(0), -1)
-        out = self.fc(out)
-        return out
-
 
 def load_cnn(name='MN3_small'):
     net = None
     model, size = name.split('_')
     if model == 'MN3':
         net = MobileNetV3(dropout=0.8, mode=size)
+    if model == 'CustomNet':
+        net = CustomNet(net_type=size)
     if net is None: print('No such CNN exist'); quit()
     return net
