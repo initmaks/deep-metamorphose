@@ -6,6 +6,7 @@ import numpy as np
 import torch
 from torch import from_numpy
 
+import cv2
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -135,7 +136,7 @@ class Experiment():
 
     def evaluate(self, n=10, runs_to_record = 3): #test - fully deterministic
         self.learner.eval()
-        img_list = []; fig1 = plt.figure()
+        img_list = [];
         o, d = self.test_env.reset(), False
         for j in range(n):
             o, d = self.test_env.reset(), False
@@ -149,16 +150,15 @@ class Experiment():
                 ep_len += 1
                 if j < runs_to_record:
                     i1,i2 = make_channel_last(o[0]), make_channel_last(o[1])
-                    rend_img = np.concatenate([i1,i2],axis=1)
-                    img_list.append([plt.imshow(rend_img, animated=True)])
+                    rend_img = np.concatenate([i1,i2],axis=1) * 255
+                    img_list.append(rend_img.astype(np.uint8))
             self.logger.store(TestEpRet=ep_ret, TestEpLen=ep_len)
-        if img_list:
-            # Set up formatting for the movie files
-            Writer = animation.writers['ffmpeg']
-            writer = Writer(fps=15, bitrate=1800)
-            im_ani = animation.ArtistAnimation(fig1, img_list, interval=50, repeat_delay=3000, blit=True)
-            im_ani.save(f'{self.logger.output_dir}/{self.logger.exp_name}_{self.steps_count}.mp4', writer=writer)
-            plt.close(fig1)
+        video_filename = f'{self.logger.output_dir}/{self.logger.exp_name}_{self.steps_count}.avi'
+        height, width = img_list[0].shape[:2]
+        video = cv2.VideoWriter(video_filename, 0, 10, (width,height))
+        for image in img_list: video.write(image)
+        cv2.destroyAllWindows()
+        video.release()
     
     def logger_checkpoint(self, start_time):
         self.logger.log_tabular('Epoch', self.epoch, step=self.steps_count)
