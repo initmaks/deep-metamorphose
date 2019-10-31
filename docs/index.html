@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head>  
+<html lang="en"><head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta charset="utf-8">
   <title>Computer Vision Class Project
@@ -8,7 +8,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <!-- Le styles -->  
+  <!-- Le styles -->
   <link href="css/bootstrap.css" rel="stylesheet">
   <style>
     .center {
@@ -27,7 +27,7 @@
       color: #FF9900;
     }
   </style>
-  
+
   <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
 
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
@@ -39,42 +39,56 @@
   <div class="container">
     <div class="page-header">
 
-      <!-- Title and Name --> 
-      <h1>DeepMetamorphose</h1> 
-      <span style="font-size: 20px; line-height: 1.5em;"><strong>Your Name Here</strong></span><br>
+      <!-- Title and Name -->
+      <h1>DeepMetamorphose</h1>
+      <span style="font-size: 20px; line-height: 1.5em;"><strong>Maksim Sorokin, Deepak Srikanth, William Tidwell</strong></span><br>
       <span style="font-size: 18px; line-height: 1.5em;">Fall 2019 CS 6476 Computer Vision: Class Project</span><br>
       <span style="font-size: 18px; line-height: 1.5em;">Georgia Tech</span>
       <hr>
 
+      <h3>Abstract</h3>
+      Ever since the advent of Generative Adversarial Networks (GANs) [1], much work has been done in the area of generating images. Though a great deal has been accomplished, including super-resolution [2], image restoration [3], and style-transer [4], the majority of the focus has been on two-dimensional images. Our approach not only attempts to tackle three-dimensional image creation, but we propose using Reinforcement Learning (RL) methods to do so rather than GANs.
 
-      <h3>Problem Statement:</h3>
-      Inspiration for this project comes from the art work of Matthieu Robert-Ortis, the style of which the author has named <b>Métamorphose</b>.
-      <iframe width="840" height="460" src="https://www.youtube.com/embed/PiYMol0VjWo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <h3>Problem Statement</h3>
+      Anamorphosis is a distorted projection of an object that requires the viewer to use special devices, have a certain vantage point, or both, in order to properly view the object. Inspiration for this project comes from the art work of Matthieu Robert-Ortis, the style of which the author has named <b>Métamorphose</b>. Métamorphose builds upon the concept of anamorphosis by combining two anamorphic objects. Generally speaking, from one vantage point the viewer sees one object, and from a different vantage point, he sees a second object.
+      <iframe class="center" width="840" height="460" src="https://www.youtube.com/embed/PiYMol0VjWo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       <br>
-      Anamorphosis is a distorted projection of an object that requires the viewer to use special devices, have a certain vantage point, or both, in order to properly view the object. Métamorphose builds upon this by combining two anamorphic objects.
-      Generally speaking, from one vantage point the viewer sees one object, and from a different vantage point, he sees a second object.
-      Some examples of this are the cover of Gödel, Escher, Bach: An Eternal Golden Braid by Douglas Hofstadter or the logo of the popular deep learning framework TensorFlow.
+
+      Some additional, well-known examples of this are the cover of Gödel, Escher, Bach: An Eternal Golden Braid by Douglas Hofstadter and the logo of the popular deep learning framework TensorFlow.
       <figure class="center">
         <img src="GEB.jpg" alt="Goedel Escher Bach" style="width:200px;height:200px;">
 
         <img src="TF.png" alt="Goedel Escher Bach" style="width:200px;height:200px;">
-        <figcaption>Examples of Métamorphose: the cover of Goedel Escher Bach and the logo of TensorFlow </figcaption>
+        <figcaption>The Cover of Goedel Escher Bach, The TensorFlow Logo</figcaption>
       </figure>
       <br>
-      The goal of this project is to develop a model that takes two images as input and generates a 3D object which, if viewed from two specific vantage points, will represent the two original images. 
 
+      The goal of this project is to develop a model that takes two images as input and generates a 3D object which, if viewed from two specific vantage points, will represent the two original images.
 
-      <!-- Approach -->
       <h3>Approach</h3>
+      Since there does not exist a proper dataset for training such a model, a Reinforcement Learning (RL) algorithm is used. More specifically, we have implemented the Twin Delayed Deep Deterministic Policy Gradient (TD3) algorithm [5]. TD3 makes use of the Actor-Critic method with a pair of critic networks, as well as a target network. Our implementation also includes a Convolutional Neural Network (CNN) that is used as part of the policy but is a separate network. We have also created an OpenAI gym environment with which our agent interacts.
 
-      Since there does not exist a proper dataset for training such a model, a Reinforcement Learning (RL) algorithm will be used. In this case, a Convolutional Neural Network (CNN) will be trained to determine the policy of the RL agent. The agent will take as input the two original images along with a projection of each image from the previous iteration of training, as shown in the figure below. 
+      The agent takes as input 4 images: the first image is the desired output from the front face, the second image is the desired output from the left face, the third image is the projected view of the drawing thus far from the front face, and the fourth image is the projected view of the drawing thus far from the left face. Each image passes through the CNN, which outputs a feature representation. The four feature representations are then passed to the policy network, which returns an action as an (x, y, z) point in the three-dimensional space. It is at this point that a pixel will be colored. This is demonstrated in the figure below.
       <figure>
-        <img src="process.png" alt="process" style="width:800px;height:600px;" class="center">
-
-
+        <img src="process2.png" alt="process" style="width:800px;height:600px;" class="center">
         <figcaption></figcaption>
       </figure>
       <br>
+
+      In order to train an RL agent, careful consideration must be given to the rewards and the rewards schedule. We are currently using loss as defined in Perceptual Losses for Real-time Style Transfer and Super-Resolution [6]. This loss function combines a pixel loss, a feature loss, and a style loss. This a good fit for our application because, although we want the pixels to match, they don't have to match exactly as long as the features are the same. For example, and image that is translated will have a large pixel loss, but the feature loss will be low, because the content of the image is virtually unchanged. The reward is then defined as the negative of the loss to encourage a smaller loss. The reward schedule is currently defined such that the drawn image is evaluated after every action. However, the optimal strategy is still up for discussion. Early on in the drawing process, no matter what pixel is colored, the loss is going to be very high. For that reason, we are considering letting the agent draw multiple pixels before a reward is given and an update is made.
+      <br>
+
+      The dataset we have chosen to use is MNIST [7].
+
+
+
+      In order to simplify things and experiment with our technique, we have started by attempting to solve a two-dimensional version of the problem. The general approach is the same betweent the two methods. The key difference is that, for the two-dimensional case, the input to the agent is only two images: the input image and the projected view of the drawing thus far from the front face. mage that the agent has created through the previous iteration of drawing; the second image is the target image.
+
+      . The agent takes as input two
+
+      two critic networks, In addition to the standard we haveIn this case, a Convolutional Neural Network (CNN) will be trained to determine the policy of the RL agent. The agent will take as input the two original images along with a projection of each image from the previous iteration of training, as shown in the figure below.
+
+
       Each image will pass through a CNN, which will share weights with the other three CNNs. Features from each of the four CNNs will be concatenated and fed into a policy network to produce an action, which could either be a blob/sphere of a certain size and color at a certain location or a line of a certain size and color.
 
       <h4>Environment Rewards</h4>
@@ -106,19 +120,26 @@
       <figure class = "center">
         <img src="MNIST_eg.png" alt="mnist" style="width:250px;height:250px;">
         <img src="kmnist.png" alt="kmnist" style="width:200px;height:200px;">
-
-
         <figcaption>Sample images from the MNIST (left) and KMNIST datasets</figcaption>
       </figure>
       <br>
+
+      <h3>Bibliography</h3>
+      <a href="https://arxiv.org/pdf/1406.2661.pdf">[1] Generative Adversarial Networks</a><br>
+      <a href="https://cs.stanford.edu/people/jcjohns/papers/eccv16/JohnsonECCV16.pdf">[2] Perceptual Lossesfor Real-Time Style Transfer and Super-Resolution</a><br>
+      <a href="https://cs.stanford.edu/people/jcjohns/papers/eccv16/JohnsonECCV16.pdf">[3] Perceptual Lossesfor Real-Time Style Transfer and Super-Resolution</a><br>
+      <a href="https://cs.stanford.edu/people/jcjohns/papers/eccv16/JohnsonECCV16.pdf">[4] Perceptual Lossesfor Real-Time Style Transfer and Super-Resolution</a><br>
+      <a href="https://arxiv.org/pdf/1802.09477.pdf">[5] Addressing Fucntion Approximation Error in Actor-Critic Methods</a><br>
+      <a href="https://cs.stanford.edu/people/jcjohns/papers/eccv16/JohnsonECCV16.pdf">[6] Perceptual Lossesfor Real-Time Style Transfer and Super-Resolution</a><br>
+
+
+
+
+
       <br><br>
 
-
-
-
-
       <hr>
-      <footer> 
+      <footer>
         <b>Template credits:</b> <a href="https://filebox.ece.vt.edu/~F15ECE5554ECE4984/resources/final_webpage.zip">link</a>
 
         <p>© Georgia Tech - CS6476 - Computer Vision</p>
