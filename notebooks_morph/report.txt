@@ -1,0 +1,123 @@
+TensorFlow 2.0 Upgrade Script
+-----------------------------
+Converted 1 files
+Detected 6 issues that require attention
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+File: train_gan_painter.ipynb
+--------------------------------------------------------------------------------
+train_gan_painter.ipynb:249:8: WARNING: *.save requires manual check. (This warning is only applicable if the code saves a tf.Keras model) Keras model.save now saves to the Tensorflow SavedModel format by default, instead of HDF5. To continue saving to HDF5, add the argument save_format='h5' to the save() function.
+train_gan_painter.ipynb:291:22: ERROR: Using member tf.contrib.layers.batch_norm in deprecated module tf.contrib. tf.contrib.layers.batch_norm cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+train_gan_painter.ipynb:294:22: ERROR: Using member tf.contrib.layers.batch_norm in deprecated module tf.contrib. tf.contrib.layers.batch_norm cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+train_gan_painter.ipynb:312:25: ERROR: Using member tf.contrib.layers.fully_connected in deprecated module tf.contrib. tf.contrib.layers.fully_connected cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+train_gan_painter.ipynb:351:13: ERROR: Using member tf.contrib.framework.arg_scope in deprecated module tf.contrib. tf.contrib.framework.arg_scope cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+train_gan_painter.ipynb:580:4: WARNING: *.save requires manual check. (This warning is only applicable if the code saves a tf.Keras model) Keras model.save now saves to the Tensorflow SavedModel format by default, instead of HDF5. To continue saving to HDF5, add the argument save_format='h5' to the save() function.
+================================================================================
+Detailed log follows:
+
+================================================================================
+--------------------------------------------------------------------------------
+Processing file 'train_gan_painter.ipynb'
+ outputting to 'train_gan_painter_tf2.ipynb'
+--------------------------------------------------------------------------------
+
+249:8: WARNING: *.save requires manual check. (This warning is only applicable if the code saves a tf.Keras model) Keras model.save now saves to the Tensorflow SavedModel format by default, instead of HDF5. To continue saving to HDF5, add the argument save_format='h5' to the save() function.
+291:22: ERROR: Using member tf.contrib.layers.batch_norm in deprecated module tf.contrib. tf.contrib.layers.batch_norm cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+294:22: ERROR: Using member tf.contrib.layers.batch_norm in deprecated module tf.contrib. tf.contrib.layers.batch_norm cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+306:13: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+309:17: INFO: Added keywords to args of function 'tf.shape'
+312:25: ERROR: Using member tf.contrib.layers.fully_connected in deprecated module tf.contrib. tf.contrib.layers.fully_connected cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+316:36: INFO: tf.random_normal_initializer requires manual check. Initializers no longer have the dtype argument in the constructor or partition_info argument in the __call__ method.
+The calls have been converted to compat.v1 for safety (even though they may already have been correct).
+316:36: INFO: Renamed 'tf.random_normal_initializer' to 'tf.compat.v1.random_normal_initializer'
+322:36: INFO: tf.random_normal_initializer requires manual check. Initializers no longer have the dtype argument in the constructor or partition_info argument in the __call__ method.
+The calls have been converted to compat.v1 for safety (even though they may already have been correct).
+322:36: INFO: Renamed 'tf.random_normal_initializer' to 'tf.compat.v1.random_normal_initializer'
+327:36: INFO: tf.random_normal_initializer requires manual check. Initializers no longer have the dtype argument in the constructor or partition_info argument in the __call__ method.
+The calls have been converted to compat.v1 for safety (even though they may already have been correct).
+327:36: INFO: Renamed 'tf.random_normal_initializer' to 'tf.compat.v1.random_normal_initializer'
+332:36: INFO: tf.random_normal_initializer requires manual check. Initializers no longer have the dtype argument in the constructor or partition_info argument in the __call__ method.
+The calls have been converted to compat.v1 for safety (even though they may already have been correct).
+332:36: INFO: Renamed 'tf.random_normal_initializer' to 'tf.compat.v1.random_normal_initializer'
+341:31: INFO: Renamed 'tf.global_variables' to 'tf.compat.v1.global_variables'
+351:13: ERROR: Using member tf.contrib.framework.arg_scope in deprecated module tf.contrib. tf.contrib.framework.arg_scope cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+353:15: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+354:19: INFO: Added keywords to args of function 'tf.shape'
+362:38: INFO: tf.random_normal_initializer requires manual check. Initializers no longer have the dtype argument in the constructor or partition_info argument in the __call__ method.
+The calls have been converted to compat.v1 for safety (even though they may already have been correct).
+362:38: INFO: Renamed 'tf.random_normal_initializer' to 'tf.compat.v1.random_normal_initializer'
+367:38: INFO: tf.random_normal_initializer requires manual check. Initializers no longer have the dtype argument in the constructor or partition_info argument in the __call__ method.
+The calls have been converted to compat.v1 for safety (even though they may already have been correct).
+367:38: INFO: Renamed 'tf.random_normal_initializer' to 'tf.compat.v1.random_normal_initializer'
+372:38: INFO: tf.random_normal_initializer requires manual check. Initializers no longer have the dtype argument in the constructor or partition_info argument in the __call__ method.
+The calls have been converted to compat.v1 for safety (even though they may already have been correct).
+372:38: INFO: Renamed 'tf.random_normal_initializer' to 'tf.compat.v1.random_normal_initializer'
+377:38: INFO: tf.random_normal_initializer requires manual check. Initializers no longer have the dtype argument in the constructor or partition_info argument in the __call__ method.
+The calls have been converted to compat.v1 for safety (even though they may already have been correct).
+377:38: INFO: Renamed 'tf.random_normal_initializer' to 'tf.compat.v1.random_normal_initializer'
+383:31: INFO: Renamed 'tf.global_variables' to 'tf.compat.v1.global_variables'
+393:27: INFO: Renamed 'tf.gfile.Glob' to 'tf.io.gfile.glob'
+404:8: INFO: Renamed 'tf.logging.info' to 'tf.compat.v1.logging.info'
+407:6: INFO: Renamed 'tf.logging.info' to 'tf.compat.v1.logging.info'
+422:30: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+424:15: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+425:21: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+429:19: INFO: Added keywords to args of function 'tf.reduce_mean'
+430:24: INFO: Added keywords to args of function 'tf.reduce_mean'
+432:24: INFO: tf.summary.scalar requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+432:24: INFO: Renamed 'tf.summary.scalar' to 'tf.compat.v1.summary.scalar'
+433:20: INFO: tf.summary.scalar requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+433:20: INFO: Renamed 'tf.summary.scalar' to 'tf.compat.v1.summary.scalar'
+435:28: INFO: Added keywords to args of function 'tf.reduce_mean'
+436:24: INFO: tf.summary.scalar requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+436:24: INFO: Renamed 'tf.summary.scalar' to 'tf.compat.v1.summary.scalar'
+439:31: INFO: Renamed 'tf.placeholder_with_default' to 'tf.compat.v1.placeholder_with_default'
+440:17: INFO: tf.summary.scalar requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+440:17: INFO: Renamed 'tf.summary.scalar' to 'tf.compat.v1.summary.scalar'
+441:13: INFO: Added keywords to args of function 'tf.reduce_mean'
+441:13: INFO: Renamed keyword argument for tf.reduce_mean from reduction_indices to axis
+446:13: INFO: Renamed 'tf.where' to 'tf.compat.v1.where'
+446:49: INFO: Added keywords to args of function 'tf.shape'
+446:97: INFO: Added keywords to args of function 'tf.shape'
+449:6: INFO: tf.summary.image requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+449:6: INFO: Renamed 'tf.summary.image' to 'tf.compat.v1.summary.image'
+451:23: INFO: Added keywords to args of function 'tf.reduce_mean'
+452:31: INFO: tf.summary.scalar requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+452:31: INFO: Renamed 'tf.summary.scalar' to 'tf.compat.v1.summary.scalar'
+458:16: INFO: Renamed 'tf.random_uniform' to 'tf.random.uniform'
+462:12: INFO: Added keywords to args of function 'tf.gradients'
+465:20: INFO: Added keywords to args of function 'tf.reduce_sum'
+466:12: INFO: Added keywords to args of function 'tf.reduce_mean'
+470:30: INFO: tf.summary.scalar requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+470:30: INFO: Renamed 'tf.summary.scalar' to 'tf.compat.v1.summary.scalar'
+471:20: INFO: tf.summary.scalar requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+471:20: INFO: Renamed 'tf.summary.scalar' to 'tf.compat.v1.summary.scalar'
+476:31: INFO: Renamed 'tf.assign' to 'tf.compat.v1.assign'
+479:37: INFO: Renamed 'tf.get_collection' to 'tf.compat.v1.get_collection'
+479:55: INFO: Renamed 'tf.GraphKeys' to 'tf.compat.v1.GraphKeys'
+480:26: INFO: Renamed 'tf.train.AdamOptimizer' to 'tf.compat.v1.train.AdamOptimizer'
+482:26: INFO: Renamed 'tf.train.AdamOptimizer' to 'tf.compat.v1.train.AdamOptimizer'
+486:18: INFO: Renamed 'tf.global_variables_initializer' to 'tf.compat.v1.global_variables_initializer'
+489:6: INFO: tf.summary.image requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+489:6: INFO: Renamed 'tf.summary.image' to 'tf.compat.v1.summary.image'
+490:6: INFO: tf.summary.image requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+490:6: INFO: Renamed 'tf.summary.image' to 'tf.compat.v1.summary.image'
+491:24: INFO: tf.summary.merge_all requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+491:24: INFO: Renamed 'tf.summary.merge_all' to 'tf.compat.v1.summary.merge_all'
+499:30: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+500:21: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+502:18: INFO: Renamed 'tf.global_variables_initializer' to 'tf.compat.v1.global_variables_initializer'
+505:9: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+531:19: INFO: tf.summary.FileWriter requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+531:19: INFO: Renamed 'tf.summary.FileWriter' to 'tf.compat.v1.summary.FileWriter'
+568:16: INFO: Renamed 'tf.Session' to 'tf.compat.v1.Session'
+577:14: INFO: Renamed 'tf.train.Saver' to 'tf.compat.v1.train.Saver'
+577:29: INFO: Renamed 'tf.global_variables' to 'tf.compat.v1.global_variables'
+579:4: INFO: Renamed 'tf.logging.info' to 'tf.compat.v1.logging.info'
+580:4: WARNING: *.save requires manual check. (This warning is only applicable if the code saves a tf.Keras model) Keras model.save now saves to the Tensorflow SavedModel format by default, instead of HDF5. To continue saving to HDF5, add the argument save_format='h5' to the save() function.
+584:14: INFO: Renamed 'tf.train.Saver' to 'tf.compat.v1.train.Saver'
+584:29: INFO: Renamed 'tf.global_variables' to 'tf.compat.v1.global_variables'
+589:4: INFO: Renamed 'tf.logging.info' to 'tf.compat.v1.logging.info'
+605:2: INFO: Renamed 'tf.reset_default_graph' to 'tf.compat.v1.reset_default_graph'
+--------------------------------------------------------------------------------
+

@@ -1,0 +1,196 @@
+<figure id="figure-spiral-examples" class="base-grid">
+  
+  <div id='container'>
+    <div class="controls">
+      <div class="background-controls">
+        <select bind:value="dataset">
+          <option value="mnist">MNIST</option>
+          <option value="kmnist">KMNIST</option>
+          <option value="celeba">CelebA</option>
+        </select>
+        <div class="separator"></div>
+        <select class:hide="dataset !== 'celeba'" bind:value="painter">
+          <option value="vae">VAE</option>
+          <option value="gan">GAN</option>
+        </select>
+        <span class:hide="dataset === 'celeba'" class="figcaption">{painterDisplay}</span>
+        <div class="separator"></div>
+      </div>
+      <div class="blending-controls">
+        <span class="figcaption">No. of strokes</span>
+        <select class:hide="dataset !== 'celeba'" bind:value="strokes">
+          <option value=0>15</option>
+          <option selected value=1>30</option>
+        </select>
+        <span class:hide="dataset === 'celeba'" class="figcaption">{actualStrokes}</span>
+      </div>
+      <ColabLink :url/>
+    </div>
+
+    <div class="video-container">
+      <video ref:video class="video" loop autoplay playsinline muted>
+        <source ref:source src="{video_src}" type="video/mp4"/>
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  
+  </div>
+  
+</figure>
+
+
+<style>
+  figure {
+    padding: 16px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    
+    transition: background 0.35s;
+    
+    grid-row-gap: 10px;
+  }
+
+  .video-container {
+    grid-column: 1 / -1;
+
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .video {
+    border: 1px solid #000; 
+    height: 100%; 
+    width: 100%;
+  }
+
+  #container {
+    display: grid;
+    position: relative;
+    z-index: 1;
+    grid-gap: 8px;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column: text-start / text-end;
+  }
+  
+  @media (min-width: 768px) {
+    #container {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  @media (min-width: 1180px) {
+    #container {
+      grid-template-columns: repeat(4, 168px);
+    }
+  }
+  
+  figure {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  
+  .controls {
+    grid-column: 1 / -1;
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    
+    background-color: hsl(0, 0%, 97%);
+    background-color: hsla(0, 0%, 97%, 0.85);
+    padding: 8px;
+    
+    transition: opacity 0.35s, background-color 0.35s;
+  }
+  
+  .controls > :global(.colab-root) {
+    margin-top: 3px;
+    margin-bottom: 3px;
+  }
+  
+  .blending-controls {
+    display: flex;
+    flex-flow: row;
+    align-content: stretch;
+    min-width: 150px;
+    max-width: 250px;
+    flex-basis: auto;
+    flex-grow: 1;
+  }
+
+  .hide {
+    display: none;
+  }
+  
+  .blending-controls > span {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  
+  .separator {
+    display: inline-block;
+    content: '';
+    width: 5px;
+    height: 100%;
+    background-color: red;
+  }
+  
+
+</style>
+
+
+<script>
+import ColabLink from '../components/ColabLink.html';
+import { subsections } from '../colab_urls.json';
+export default {
+  onupdate({ previous }) {
+    console.log('onupdate');
+    if (this.refs.video !== undefined) {
+      this.refs.video.load();  // Is this valid?
+    }
+  },
+
+  data() {
+    return {
+      mode: 'normal',
+      backgroundMode: 'light',
+      backgroundOpacity: 0.5,
+      url: subsections[2].colab_url,
+      dataset: 'celeba',
+      painter: 'gan',
+      strokes: 1
+    }
+  },
+  computed: {
+    video_src: ({dataset, painter, actualStrokes}) => {
+      console.log(dataset, painter, actualStrokes);
+      if (dataset === 'celeba') {
+        return "images/spiral-examples/" + dataset + "_" + painter + "_" + actualStrokes + ".mp4"
+      } else {
+        return "images/spiral-examples/" + dataset + "_" + "vae" + ".mp4"
+      }
+    },
+    actualStrokes: ({dataset, strokes}) => {
+      if (dataset === 'celeba') {
+        return [15, 30][strokes];
+        //return 30
+      } else if (dataset === 'kmnist') {
+        return 20;
+      } else {
+        return 8;
+      }
+    },
+    painterDisplay: ({painter, dataset}) => {
+      return 'VAE';
+    }
+  },
+  methods: {
+    
+  },
+  components: { ColabLink }
+}
+</script>

@@ -1,0 +1,10 @@
+{
+  "subsections": [
+    {"colab_url": "https://colab.research.google.com/github/reiinakano/neural-painters/blob/master/notebooks/train_vae_painter.ipynb", "title": "training-vae-painters" },
+    {"colab_url": "https://colab.research.google.com/github/reiinakano/neural-painters/blob/master/notebooks/train_gan_painter.ipynb", "title": "training-gan-painters" },
+    {"colab_url": "https://colab.research.google.com/github/reiinakano/neural-painters/blob/master/notebooks/recreating_spiral.ipynb", "title": "recreating-spiral" },
+    {"colab_url": "https://colab.research.google.com/github/reiinakano/neural-painters/blob/master/notebooks/learning_human_strokes.ipynb", "title": "towards-human-strokes" },
+    {"colab_url": "https://colab.research.google.com/github/reiinakano/neural-painters/blob/master/notebooks/visualizing_imagenet_classes.ipynb", "title": "visualizing-imagenet" },
+    {"colab_url": "https://colab.research.google.com/github/reiinakano/neural-painters/blob/master/notebooks/intrinsic_style_transfer.ipynb", "title": "intrinsic-style-transfer" }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "sections": [
+    { "title": "Training Painter Networks", "anchor": "#section-training-painter-networks", "sprite_index": 0  },
+    { "title": "Recreating SPIRAL Results", "anchor": "#section-recreating-spiral", "sprite_index": 1 },
+    { "title": "Learning Human Strokes", "anchor": "#section-expert-teaching", "sprite_index": 2 },
+    { "title": "As a Differentiable Image Parameterization", "anchor": "#section-diff-image-param", "sprite_index": 3 }
+  ]
+}

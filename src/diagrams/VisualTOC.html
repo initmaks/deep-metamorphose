@@ -1,0 +1,46 @@
+  <div class="video-container">
+    <video class="video" autoplay playsinline muted>
+      <source src="{video_src}" type="video/mp4"/>
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+<style>
+.video-container {
+  grid-column: 1 / -1;
+
+  display: flex;
+  margin-left: calc(50% - 50vw);
+  height: 100%;
+  width: 100vw;
+  justify-content: center;
+  align-items: center;
+}
+
+.video {
+  height: 100%; 
+  width: 100%;
+}
+
+</style>
+
+
+<script>
+const VIDEOS = [
+  "images/banner-vids/itsu.mp4",
+  "images/banner-vids/falls.mp4",
+  "images/banner-vids/sydney.mp4",
+  "images/banner-vids/fuji.mp4",
+  "images/banner-vids/big_ben.mp4",
+  "images/banner-vids/liberty.mp4",
+  "images/banner-vids/pyramids.mp4"
+];
+
+export default {
+  data() {
+    return {
+      video_src: VIDEOS[Math.floor(Math.random() * VIDEOS.length)]
+    }
+  }
+}
+</script>

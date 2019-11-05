@@ -1,0 +1,117 @@
+<figure id="figure-style-transfer-examples">
+  <ExampleSelector {items} bind:index></ExampleSelector>
+  Grayscale<input bind:checked=gray type="checkbox">
+
+  <div class="video-container">
+    <video ref:video class="video" loop autoplay playsinline muted>
+      <source ref:source src="{video_src}" type="video/mp4"/>
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+</figure>
+
+<span class="figcaption l-body">
+  Painting {text}
+</span>
+
+<style>
+  figure {
+    grid-column: screen;
+    padding: 16px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    
+    transition: background 0.35s;
+    
+    grid-row-gap: 10px;
+  }
+
+  .video-container {
+    grid-column: 1 / -1;
+
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .video {
+    height: 100%; 
+    width: 100%;
+  }
+  
+  figure {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .figcaption {
+    margin-top: 10px;
+  }
+</style>
+
+
+<script>
+import ExampleSelector from '../components/ExampleSelector';
+import { sections } from '../sections.json';
+
+const samples = [
+  {
+    name: "golden_gate",
+    text: "the Golden Gate Bridge",
+    src: "images/style-transfer-examples/golden_gate.jpg"
+  },
+  {
+    name: "flamingo",
+    text: "a flamingo",
+    src: "images/style-transfer-examples/flamingo.jpg"
+  },
+  {
+    name: "big_ben",
+    text: "Big Ben",
+    src: "images/style-transfer-examples/big_ben.png"
+  },
+  {
+    name: "stata",
+    text: "the Stata Center",
+    src: "images/style-transfer-examples/stata.jpg"
+  },
+  {
+    name: "eiffel",
+    text: "the Eiffel Tower",
+    src: "images/style-transfer-examples/eiffel.jpg"
+  },
+  {
+    name: "fuji",
+    text: "Mt. Fuji",
+    src: "images/style-transfer-examples/fuji.jpg"
+  },
+  {
+    name: "notre_dame",
+    text: "the Notre Dame",
+    src: "images/style-transfer-examples/notre_dame.jpg"
+  }
+];
+
+export default {
+  components: { ExampleSelector },
+  onupdate() {
+    this.refs.video.load();
+  },
+  data() {
+    return {
+      gray: false,
+      index: 0,
+      items: samples,
+    }
+  },
+  computed: {
+    video_src: ({ index, gray }) => "images/style-transfer-examples/" + samples[index].name + (gray ? "_gray" : "") + ".mp4",
+    text: ({ index }) => samples[index].text,
+  },
+  methods: {
+  },
+}
+</script>
