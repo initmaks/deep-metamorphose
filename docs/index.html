@@ -84,6 +84,35 @@
       </figure>
       <br>
 
+
+        <h4>Modelling the problem as a two-player-game</h4>
+          <h5>Inputs</h5>
+          <ul>
+          <li>Two binarized images (im1, im2), each containing a single connected component</li>
+          <li>A target height of the point cloud</li>
+          </ul>
+          <h5>Pre-processing:</h5>
+          <ul>
+          <li>First, the two input images were cropped to the bounding box of the connected component.</li>
+          <li>The images were then scaled to the height of the target height, keeping their aspect ratios constant.</li>
+          </ul>
+          <h5>Two Player game:</h5>
+          This approach can be thought of as a two-player game, with two players working collaboratively to build the point cloud. 
+          <br>
+          Player 1&rsquo;s goal is for the projection of the point cloud onto the x-y plane to resemble im1, and Player 2&rsquo;s goal is for the projection on the x-z plane to resemble im2.
+          <br>
+          The point cloud is initially empty, and is built up in an iterative, turn-by-turn process.
+          <br><br>
+          A single &lsquo;turn&rsquo; follows the following process: <br>
+          Player 1 considers the projection of the point cloud onto the x-y plane (let this be proj1), along with im1. If there are any points in im1 that are not represented in proj1, then one such point (x1,y1) is chosen uniformly randomly from this set of possible points.<br>
+          Player 2 now accepts this choice of (x1,y1), and chooses a set of&nbsp;<em>z</em> values &lt;z1,z2...zn&gt; such that (x1, zi)&nbsp; are in the image im2. All these points (x1, y2, z) are inserted into the point cloud.
+          <p>&nbsp;</p>
+          In the next turn , players 1 and 2 switch roles, with player 2 choosing a (x,z) pair, and player 1 placing points in the point cloud that satisfy im1's requirements.
+          This process then continues with Players 1 and 2 switching roles each iteration.
+          <p>&nbsp;</p>
+          This process continues until the point cloud is fully built. This is determined by the projections of the cloud matching m1 and m2.
+          <p>&nbsp;</p>
+          <p>&nbsp;</p>
       <h3>Experiments and results</h3>
 
       To simplify things and incrementally test our approach, we have broken our experiments down as follows:
@@ -108,6 +137,22 @@
      <br><br>
 
      As we continue to train the agent, particularly once we start seeing promising results, we will move on the training on the full MNIST dataset for the two-dimensional case while simultaneously beginning on the three-dimensional case for a single problem. Between the members of the group, we can split the work and, hopefully, share the insights gleaned from the different problems when moving to the difficult three-dimensional case.
+
+     <h4>Two player Game</h4>
+
+     Input images: <br>
+     <figure class="center">
+        <img src="INSERT_HERE.png" alt="im1" style="width:250px;height:250px;">
+        <img src="INSERT_HERE.png" alt="im2" style="width:200px;height:200px;">
+        <figcaption>Input binary images for the two player game</figcaption>
+      </figure>
+      <br>
+
+      The two player game model in action: <br>
+      <video class="center" width="320" height="240" controls>
+          <source src="VIDEO_HERE.mp4" type="video/mp4">
+       </video>
+
 
       <!-- <h4>Environment Rewards</h4>
       As per environment rewards for RL there are a couple of options we have in mind:
