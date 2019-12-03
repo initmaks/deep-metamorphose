@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en"><head>  
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>Computer Vision Class Project
+  | CS, Georgia Tech | Fall 2019: CS6476</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+<!-- Le styles -->  
+  <link href="css/bootstrap.css" rel="stylesheet">
+<style>
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+body {
+padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+}
+.vis {
+color: #3366CC;
+}
+.data {
+color: #FF9900;
+}
+</style>
+  
+<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
+<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+</head>
+
+<body>
+<div class="container">
+<div class="page-header">
+
+<!-- Title and Name --> 
+<h1>DeepMetamorphose</h1> 
+<span style="font-size: 20px; line-height: 1.5em;"><strong>Maksim Sorokin, Trace Tidwell, Deepak Srikanth </strong></span><br>
+<span style="font-size: 18px; line-height: 1.5em;">Fall 2019 CS 6476 Computer Vision: Class Project</span><br>
+<span style="font-size: 18px; line-height: 1.5em;">Georgia Tech</span>
+<hr>
+
+
+<h3>Problem Statement:</h3>
+Inspiration for this project comes from the art work of Matthieu Robert-Ortis, the style of which the author has named <b>Métamorphose</b>.
+<iframe width="840" height="460" src="https://www.youtube.com/embed/PiYMol0VjWo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<br>
+Anamorphosis is a distorted projection of an object that requires the viewer to use special devices, have a certain vantage point, or both, in order to properly view the object. Métamorphose builds upon this by combining two anamorphic objects.
+Generally speaking, from one vantage point the viewer sees one object, and from a different vantage point, he sees a second object.
+Some examples of this are the cover of Gödel, Escher, Bach: An Eternal Golden Braid by Douglas Hofstadter or the logo of the popular deep learning framework TensorFlow.
+<figure class="center">
+<img src="GEB.jpg" alt="Goedel Escher Bach" style="width:200px;height:200px;">
+         
+<img src="TF.png" alt="Goedel Escher Bach" style="width:200px;height:200px;">
+<figcaption>Examples of Métamorphose: the cover of Goedel Escher Bach and the logo of TensorFlow </figcaption>
+</figure>
+<br>
+The goal of this project is to develop a model that takes two images as input and generates a 3D object which, if viewed from two specific vantage points, will represent the two original images. 
+
+
+<!-- Approach -->
+<h3>Approach</h3>
+
+Since there does not exist a proper dataset for training such a model, a Reinforcement Learning (RL) algorithm will be used. In this case, a Convolutional Neural Network (CNN) will be trained to determine the policy of the RL agent. The agent will take as input the two original images along with a projection of each image from the previous iteration of training, as shown in the figure below. 
+<figure>
+    <img src="process.png" alt="process" style="width:800px;height:600px;" class="center">
+             
+  
+    <figcaption></figcaption>
+    </figure>
+    <br>
+Each image will pass through a CNN, which will share weights with the other three CNNs. Features from each of the four CNNs will be concatenated and fed into a policy network to produce an action, which could either be a blob/sphere of a certain size and color at a certain location or a line of a certain size and color.
+
+<br><br>
+<!-- Results -->
+<h3>Experiments and results</h3>
+The project will be broken into two parts: learning to draw in 2D and then extension to 3D.
+<br>
+<b>Tools:</b> Pytorch, Matplotlib (for 2d/3d rendering)
+<br><br>
+<b>List of experiments:</b>
+<ul>
+    <li>Overfitting to a single data sample - drawing in 2D</li>
+    <li>Training on MNIST dataset - drawing in 2D</li>
+    <li>Overfitting to a single data sample - drawing in 3D</li>
+    <li>Training on MNIST dataset - drawing in 3D</li>
+    <li>Training on larger, more difficult dataset (e.g KMNIST) - drawing in 3D (stretch goal)</li>
+  </ul>
+
+  <figure class = "center">
+      <img src="MNIST_eg.png" alt="mnist" style="width:250px;height:250px;">
+      <img src="kmnist.png" alt="kmnist" style="width:200px;height:200px;">
+               
+    
+      <figcaption>Sample images from the MNIST (left) and KMNIST datasets</figcaption>
+      </figure>
+      <br>
+<br><br>
+
+
+
+
+
+  <hr>
+  <footer> 
+  <p>© You Name Here</p>
+  </footer>
+</div>
+</div>
+
+<br><br>
+
+</body></html>
