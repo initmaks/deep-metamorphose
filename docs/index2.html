@@ -2,8 +2,7 @@
 <html lang="en"><head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta charset="utf-8">
-  <title>Computer Vision Class Project
-  | CS, Georgia Tech | Fall 2019: CS6476</title>
+  <title>DeepMetamorphose | CS6476: Computer Vision | Fall 2019, Georgia Tech</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
   <meta name="author" content="">
@@ -42,7 +41,7 @@
       <!-- Title and Name -->
       <h1>DeepMetamorphose</h1>
       <span style="font-size: 20px; line-height: 1.5em;"><strong>Maksim Sorokin, Deepak Srikanth, William Tidwell</strong></span><br>
-      <span style="font-size: 18px; line-height: 1.5em;">Fall 2019 CS 6476 Computer Vision: Class Project</span><br>
+      <span style="font-size: 18px; line-height: 1.5em;">Fall 2019,  CS6476: Computer Vision, Class Project</span><br>
       <span style="font-size: 18px; line-height: 1.5em;">Georgia Tech</span>
       <hr>
 
@@ -128,8 +127,8 @@
         coordinate. The players rotate in this manner until the point-cloud is complete. This approach showed very promising results, so we pursued it further, and the full details
         are outlined below.
 
-        <figure class="center">
-          <img src="xyz3.jpg" alt="xyz" style="width:250px;height:250px;">
+        <figure>
+          <img src="xyz3.jpg" alt="xyz" style="width:250px;height:250px;" class="center">
           <!-- <figcaption class="center">X-Y-Z Coordinate Plane</figcaption> -->
         </figure>
 
@@ -157,11 +156,10 @@
           In the next turn, Players 1 and 2 switch roles, with Player 2 choosing a (y, z) pair, and Player 1 choosing from a set of (x) coordinates that satisfy im1's requirements, after which the new point is placed in the point-cloud.
           This process then continues with Players 1 and 2 switching roles each iteration.
           <p>&nbsp;</p>
-          This process continues until the point cloud is fully built. This is determined by the projections of the cloud matching im1 and im2.
-          <p>&nbsp;</p>
+          This process continues until the point cloud is fully built. This is determined by the projections of the cloud matching im1 and im2. After getting the two binary images to work well, we sought to expand the scope to include color images. The approach was mostly the same, and the results of both are presented below.
           <p>&nbsp;</p>
 
-          After getting the two binary images to work well, we sought to expand the scope to include color images. The approach was mostly the same, and the results of both are presented below.
+
 
       <h3>Experiments and results</h3>
 
@@ -183,24 +181,27 @@
       <video class="center" width="320" height="240" controls>
         <source src="baseline_td3_58500.mp4" type="video/mp4">
      </video>
-     <br>
-     We are still early in the training stages, and we can see that the agent has not yet learned much. The policy is starting to change, though. Early on in the training, the agent returned nearly the the same action regardless of the input. The only reason for the different actions was noise added to the output. However, now we are starting to see it choose actions throughout the space. Should we continue to see improvements, we are considering two alternatives to how we train. The first is to simply prevent the agent from choosing an action that has already been chosen. As previously stated, the goal is to color in pixels. There is no reason to color a pixel more than once. The second solution is imitation learning, or using supervised learning to initially train a policy, and then using RL to improve it. We could do this by taking our input image and getting the positions of all pixels that are colored. We can then sort them and begin filling in the image one pixel at a time. The supervised learning part would to give the partially colored image as input and the next sorted pixel as output. If we could learn this mapping, even for just a subset of the colored pixels, we could potentially jump start our agent.
      <br><br>
 
      <h4>Two player Game</h4>
 
      Input images: <br>
      <figure class="center">
-        <img src="INSERT_HERE.png" alt="im1" style="width:250px;height:250px;">
-        <img src="INSERT_HERE.png" alt="im2" style="width:200px;height:200px;">
+        <img src="five.png" alt="im1" style="width:250px;height:250px;">
+        <img src="olyrings.png" alt="im2" style="width:200px;height:200px;">
         <figcaption>Input binary images for the two player game</figcaption>
       </figure>
       <br>
 
       The two player game model in action: <br>
-      <video class="center" width="320" height="240" controls>
-          <source src="VIDEO_HERE.mp4" type="video/mp4">
+      <video class="center" width="1000" height="500" controls>
+          <source src="out.mp4" type="video/mp4">
        </video>
+
+       The two player game model in action: <br>
+       <video class="center" width="1000" height="500" controls>
+           <source src="out2.mp4" type="video/mp4">
+        </video>
 
 
       <!-- <h4>Environment Rewards</h4>
@@ -213,6 +214,27 @@
       We are not sure which of the approaches will work the best, and we are planning to evaluate each at the initial stages of the project. -->
 
       <!-- Results -->
+      <h3>Conclusion</h3>
+      As is often the case, RL problems are HARD! Given finite time and resources, it can be incredibly difficult or even impossible to get an agent to learn an effective policy.
+      There are multiple reasons why the agent never learned, but what we believe to be the most likely ones are discussed below. The first is that we are dealing with a continuous
+      state space, meaning there are infinite values that can be returned. We are essentially performing a regression, where the poicy returns (x, y, z) values from 0 to 1. Even if
+      we were to discretize the space, in order to make certain the each pixel can be represented, given today's high resolution cameras, we would have to allow at least 5 decimal
+      places, which, for three-dimensional space, is still around 10^12, or 10 trillion possible values. Needless to say, even in this discrete action space, we would need a great
+      deal of data to properly learn and generalize, especially if we wanted to move to real images where every pixel is filled. Another possible reason is the reward structure.
+      As previously discussed, we were providing feedback after every action. However, at the start of any episode, the canvas will be blank, and the drawn image will be very different
+      from the desired image(s). A couple of alternatives were to let the agent make multiple actions before providing any reward or increasing the size of the blob the agent makes
+      at each action. In either case, we would be closer to replicating a painter's brush stroke, which is also more realistic. As for the imitation learning approach, while perhaps
+      still a better approach, it is an inherently difficult problem. MNIST has 60,000 images, each of which has around 100 colored pixels, so this increases our the size of our dataset
+      to over 6 million examples for just the two-dimensional case. For three dimensions, it is even larger, and we would need an appropriately sized network and plenty of time to
+      properly train such a model. This is not to say it cannot be done, and we may continue to pursue this approach, but we have a better idea of what it takes and what to expect
+      moving forward.
+
+      As for the approach that worked, it took us taking a step back and viewing the problem from a different angle (pun somewhat intended). We have a professor who often says,
+      "Do the dumb thing first and only add intelligence if necessary." We are not sure we would call the final approach dumb, but it certainly is much simpler than our initial
+      approach, and the results are obviously much better. However, we do have a couple of ideas for improvements on the color images that we would like to potentially try. This
+      primarily concerns the way Player 2 (or the second player on the given turn) places the pixel. One idea is, rather than selecting the point uniformly at random from the set
+      of potential pixels, the player should place the pixel at the spot where the color value for im1 is closest to that of im2. We also considered placing multiple pixels and
+      trying to somewhat block out or color over pixels from the other projection that do not match its color scheme.
 
       <h3>Code</h3>
       All of the code for the project can be found <a href="https://github.com/initmaks/deep-metamorphose">here</a>. Much of the code was borrowed from previous projects of one of the group members. All libraries used can be found in the environment.yml file, and a list of references can be found below. Any code not from the group members that was used or that gave inspiration is cited in the code files themselves and will be included in the final bibliography. The key libraries/frameworks that we are using are:
@@ -235,10 +257,6 @@
       <a href="https://cs.stanford.edu/people/jcjohns/papers/eccv16/JohnsonECCV16.pdf">[6] Perceptual Lossesfor Real-Time Style Transfer and Super-Resolution</a><br>
       <a href="http://yann.lecun.com/exdb/mnist/">[7] The MNIST Databse of Handwritten Digits</a><br>
       <a href="http://codh.rois.ac.jp/kmnist/index.html.en">[8] KMNIST Dataset</a><br>
-
-
-
-
 
       <br><br>
 
