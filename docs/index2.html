@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>Computer Vision Class Project
+  | CS, Georgia Tech | Fall 2019: CS6476</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Le styles -->
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <style>
+    .center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 50%;
+    }
+    body {
+      padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+    }
+    .vis {
+      color: #3366CC;
+    }
+    .data {
+      color: #FF9900;
+    }
+  </style>
+
+  <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
+<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+</head>
+
+<body>
+  <div class="container">
+    <div class="page-header">
+
+      <!-- Title and Name -->
+      <h1>DeepMetamorphose</h1>
+      <span style="font-size: 20px; line-height: 1.5em;"><strong>Maksim Sorokin, Deepak Srikanth, William Tidwell</strong></span><br>
+      <span style="font-size: 18px; line-height: 1.5em;">Fall 2019 CS 6476 Computer Vision: Class Project</span><br>
+      <span style="font-size: 18px; line-height: 1.5em;">Georgia Tech</span>
+      <hr>
+
+      <h3>Abstract</h3>
+      Ever since the advent of Generative Adversarial Networks (GANs) [1], much work has been done in the area of generating images. Though a great deal has been accomplished,
+      including super-resolution [2], synthesizing high-resolution images, [3], and domain-transer [4], the majority of the focus has been on two-dimensional images. Our
+      approach not only attempts to tackle three-dimensional image creation, but we propose using Reinforcement Learning (RL) methods to do so rather than GANs.
+
+      <h3>Problem Statement</h3>
+      Anamorphosis is a distorted projection of an object that requires the viewer to use special devices, have a certain vantage point, or both, in order to properly view
+      the object. Inspiration for this project comes from the art work of Matthieu Robert-Ortis, the style of which the author has named <b>Métamorphose</b>. Métamorphose
+      builds upon the concept of anamorphosis by combining two anamorphic objects. Generally speaking, from one vantage point the viewer sees one object, and from a different
+      vantage point, he sees a second object. The goal of this project is to develop a model that takes two images as input and generates a 3D object which, if viewed from two
+      specific vantage points, will represent the two original images.
+      <iframe class="center" width="840" height="460" src="https://www.youtube.com/embed/PiYMol0VjWo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <br>
+
+      Some additional, well-known examples of this are the cover of Gödel, Escher, Bach: An Eternal Golden Braid by Douglas Hofstadter and the logo of the popular deep learning
+      framework TensorFlow.
+      <figure class="center">
+        <img src="GEB.jpg" alt="Goedel Escher Bach" style="width:200px;height:200px;">
+        <img src="TF.png" alt="Goedel Escher Bach" style="width:200px;height:200px;">
+        <figcaption>The Cover of Goedel Escher Bach, The TensorFlow Logo</figcaption>
+      </figure>
+      <br>
+
+      <h3>Approach</h3>
+          <h4>Pure Reinforcement Learning</h4>
+          Our intial approach was to train a Reinforcement Learning (RL) agent to create the 3D image, particularly because there is no existing dataset that we know
+          of that can be applied to this problem. More specifically, we implemented the Twin Delayed Deep Deterministic Policy Gradient (TD3) algorithm [5]. TD3 makes
+          use of the Actor-Critic method with a pair of critic networks, as well as a target network. Our implementation also includes a Convolutional Neural Network (CNN)
+          that was used as part of the policy but is a separate network. We also created an OpenAI gym environment with which our agent interacts. The agent takes as input
+          4 images: the first image is the desired output from the front face, the second image is the desired output from the left face, the third image is the projected
+          view of the drawing thus far from the front face, and the fourth image is the projected view of the drawing thus far from the left face. Each image passes
+          through the CNN, which outputs a feature representation. The four feature representations are then passed to the policy network, which returns an action as
+          an (x, y, z) point in the three-dimensional space. It is at this point that a previously blank pixel will be colored in at the given location. The
+          architecture is demonstrated in the figure below.
+          <figure>
+            <img src="process2.png" alt="process" style="width:800px;height:600px;" class="center">
+            <figcaption></figcaption>
+          </figure>
+          <br>
+
+          In order to train an RL agent, careful consideration must be given to the rewards and the rewards schedule. We are used loss as defined in Perceptual Losses for
+          Real-time Style Transfer and Super-Resolution [6]. This loss function combines a pixel loss, a feature loss, and a style loss. This a good fit for our application
+          because, although we want the pixels to match, they do not have to match exactly as long as the features are the same. For example, an image that is translated
+          will have a large pixel loss, but the feature loss will be low, because the content of the image is virtually unchanged. The reward is then defined as the negative
+          of the loss to encourage a smaller loss. The reward schedule was defined such that the drawn image is evaluated after every action. We realize that this may not have
+          been the optimal strategy, because early on in the process, no matter what pixel is colored, the loss is going to be very high. We considered letting the agent color
+          multiple pixels before evaluating its actions and making an update, but we stayed with the original strategy due to time constraints.
+          <br><br>
+
+          The dataset we chose to use with this approach is MNIST [7]. MNIST is a well-known dataset of hand-written digits from 0-9. We chose this dataset to start out
+          with because it is grayscale and the images are small (28x28). The hope was that it would be easier to produce results. In RL, another design decision is the
+          length of an episode, or how long the agent is allowed to interact with the environment before starting again. Because we are filling in pixels, there are a
+          finite number of unique actions that can be taken. In the two-dimensional MNIST space, there 28x28=784 unique actions. However, when viewing the images, it is
+          clear that most of the image is background space. A quick analysis shows that, for the 60,000 training images, the average number of filled pixels is 150 and
+          the standard deviation is 42 pixels. We have set the maximum episode length to 100 steps, because we were filling in a "blob" around the pixel that is
+          output from the network. The diameter of the blob is another hyperparameter being tuned. Had the results been promising, we would have liked to train on a more
+          difficult dataset, such as KMNIST [8].
+
+          <figure class="center">
+            <img src="MNIST_eg.png" alt="mnist" style="width:250px;height:250px;">
+            <img src="kmnist.png" alt="kmnist" style="width:200px;height:200px;">
+            <figcaption>Sample images from the MNIST (left) and KMNIST datasets</figcaption>
+          </figure>
+          <br>
+
+        <h4>Reinforcement Learning with Imitation Learning</h4>
+        After a good deal of effort with less than promising results on the pure RL approach, we decided to see if we could employ a supervised approach to pre-train the
+        policy followed by using RL to fine-tune the policy. We wanted to first see if this approach was promising, so we attempted it with only a single digit in two-dimensional
+        space. We first selected a subset of images from the digit 0. We took all pixels that were colored and sorted them by (x, y) position. To start the process, the canvas
+        is blank, so the inputs are an image of digit 0 and a blank canvas. The first (x, y) point in the sorted list became the output. Then, that pixel was colored in, and the
+        input became the original image of digit 0 and the newly created image. The output was the second (x, y) point in the sorted list. This continued until all pixels for a
+        given image were filled, at which point we moved to the next image. We used the same CNN and MLP architecture from the agent described above, with the goal of fidning
+        a decent starting point that could be improved upon by the RL training. Unfortunately, we again failed to see promising results, and were forced to reconsider our approach.
+
+        <h4>Two-player Game</h4>
+        Following much frustration and many conversations within the group, one of our members had the idea to approach the problem as a two-player game. Perhaps we could model this
+        as a game where two players work together to fill in their respective images. Consider the coordinate plane below. Imagine Player 1 sees the first input image projected on
+        the XZ plane and Player 2 sees the second input image projected on the YZ plane. Player 1 moves first and chooses an (x, z) coordinate of a pixel to be colored. Player 2
+        then chooses the corresponding (z) coordinate, and the (x, y, z) point is colored. For the next turn, Player 2 chooses a (y, z) coordinate and Player 1 chooses the (x)
+        coordinate. The players rotate in this manner until the point-cloud is complete. This approach showed very promising results, so we pursued it further, and the full details
+        are outlined below.
+
+        <figure class="center">
+          <img src="xyz3.jpg" alt="xyz" style="width:250px;height:250px;">
+          <!-- <figcaption class="center">X-Y-Z Coordinate Plane</figcaption> -->
+        </figure>
+
+          <h5>Inputs</h5>
+          <ul>
+          <li>Two binarized images (im1, im2), each containing a single connected component</li>
+          <li>A target height of the point cloud</li>
+          </ul>
+          <h5>Pre-processing</h5>
+          <ul>
+          <li>Crop the input images to a bounding box including only the connected component.</li>
+          <li>Scale the images to the target height while maintaining their aspect ratios constant.</li>
+          </ul>
+          <h5>Two-player game</h5>
+          The two players work collaboratively to build the point cloud.
+          <br>
+          Player 1&rsquo;s goal is for the projection of the point cloud onto the XZ plane to resemble im1, and Player 2&rsquo;s goal is for the projection on the YZ plane to resemble im2.
+          <br>
+          The point cloud is initially empty, and is built up in an iterative, turn-by-turn process.
+          <br><br>
+          A single &lsquo;turn&rsquo; proceeds as follows: <br>
+          Player 1 considers the projection of the point cloud onto the XZ plane (let this be proj1), along with im1. If there are any points in im1 that are not represented in proj1, then one such point (x1, z1) is chosen uniformly at random from this set of possible points.<br>
+          Player 2 now accepts this choice of (x1, z1), and chooses uniformly at random from a set of&nbsp;<em>y</em> values &lt;y1,y2...yn&gt; such that (x1, yi)&nbsp; are in im2. This new point (x1, yi, z1) is inserted into the point cloud.
+          <p>&nbsp;</p>
+          In the next turn, Players 1 and 2 switch roles, with Player 2 choosing a (y, z) pair, and Player 1 choosing from a set of (x) coordinates that satisfy im1's requirements, after which the new point is placed in the point-cloud.
+          This process then continues with Players 1 and 2 switching roles each iteration.
+          <p>&nbsp;</p>
+          This process continues until the point cloud is fully built. This is determined by the projections of the cloud matching im1 and im2.
+          <p>&nbsp;</p>
+          <p>&nbsp;</p>
+
+          After getting the two binary images to work well, we sought to expand the scope to include color images. The approach was mostly the same, and the results of both are presented below.
+
+      <h3>Experiments and results</h3>
+
+      To simplify things and incrementally test our initial approach, we broke our experiments down as follows:
+      <br><br>
+
+      <b>List of experiments:</b>
+      <ul>
+        <li>Overfitting to a single data sample - drawing in 2D</li>
+        <li>Training on MNIST dataset - drawing in 2D</li>
+        <li>Overfitting to a single data sample - drawing in 3D</li>
+        <li>Training on MNIST dataset - drawing in 3D</li>
+        <li>Training on larger, more difficult dataset (e.g KMNIST) - drawing in 3D (stretch goal)</li>
+      </ul>
+      <br>
+
+      We attempted to train the agent to draw a single digit, 0, with mixed results. Below is a short video of the agent during training. We never seemed to improve much beyond these initial results,
+      which is why we moved to the supervised approach. This yielded similar results, and, as such, were not recorded.
+      <video class="center" width="320" height="240" controls>
+        <source src="baseline_td3_58500.mp4" type="video/mp4">
+     </video>
+     <br>
+     We are still early in the training stages, and we can see that the agent has not yet learned much. The policy is starting to change, though. Early on in the training, the agent returned nearly the the same action regardless of the input. The only reason for the different actions was noise added to the output. However, now we are starting to see it choose actions throughout the space. Should we continue to see improvements, we are considering two alternatives to how we train. The first is to simply prevent the agent from choosing an action that has already been chosen. As previously stated, the goal is to color in pixels. There is no reason to color a pixel more than once. The second solution is imitation learning, or using supervised learning to initially train a policy, and then using RL to improve it. We could do this by taking our input image and getting the positions of all pixels that are colored. We can then sort them and begin filling in the image one pixel at a time. The supervised learning part would to give the partially colored image as input and the next sorted pixel as output. If we could learn this mapping, even for just a subset of the colored pixels, we could potentially jump start our agent.
+     <br><br>
+
+     <h4>Two player Game</h4>
+
+     Input images: <br>
+     <figure class="center">
+        <img src="INSERT_HERE.png" alt="im1" style="width:250px;height:250px;">
+        <img src="INSERT_HERE.png" alt="im2" style="width:200px;height:200px;">
+        <figcaption>Input binary images for the two player game</figcaption>
+      </figure>
+      <br>
+
+      The two player game model in action: <br>
+      <video class="center" width="320" height="240" controls>
+          <source src="VIDEO_HERE.mp4" type="video/mp4">
+       </video>
+
+
+      <!-- <h4>Environment Rewards</h4>
+      As per environment rewards for RL there are a couple of options we have in mind:
+      <ul>
+        <li>Pixelwise different between the produce images and the goal images</li>
+        <li><a href="https://arxiv.org/abs/1603.08155">Perception Losses</a> (L2 difference of intermediary pretrained CNN layer outputs) </li>
+        <li>Combination of above two approaches</li>
+      </ul>
+      We are not sure which of the approaches will work the best, and we are planning to evaluate each at the initial stages of the project. -->
+
+      <!-- Results -->
+
+      <h3>Code</h3>
+      All of the code for the project can be found <a href="https://github.com/initmaks/deep-metamorphose">here</a>. Much of the code was borrowed from previous projects of one of the group members. All libraries used can be found in the environment.yml file, and a list of references can be found below. Any code not from the group members that was used or that gave inspiration is cited in the code files themselves and will be included in the final bibliography. The key libraries/frameworks that we are using are:
+      <ul>
+        <li>Pytorch</li>
+        <li>torchvision</li>
+        <li>OpenAI gym</li>
+        <li>fastai</li>
+        <li>matplotlib</li>
+        <li>numpy</li>
+      </ul>
+
+
+      <h3>Bibliography</h3>
+      <a href="https://arxiv.org/pdf/1406.2661.pdf">[1] Generative Adversarial Networks</a><br>
+      <a href="https://arxiv.org/pdf/1609.04802.pdf">[2] Photo-Realistic Single Image Super-Resolution Using a Generative Adversarial Network</a><br>
+      <a href="https://arxiv.org/pdf/1711.11585.pdf">[3] High-Resolution Image Synthesis and Semantic Manipulation with Conditional GANs</a><br>
+      <a href="https://arxiv.org/pdf/1703.10593.pdf">[4] Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks</a><br>
+      <a href="https://arxiv.org/pdf/1802.09477.pdf">[5] Addressing Fucntion Approximation Error in Actor-Critic Methods</a><br>
+      <a href="https://cs.stanford.edu/people/jcjohns/papers/eccv16/JohnsonECCV16.pdf">[6] Perceptual Lossesfor Real-Time Style Transfer and Super-Resolution</a><br>
+      <a href="http://yann.lecun.com/exdb/mnist/">[7] The MNIST Databse of Handwritten Digits</a><br>
+      <a href="http://codh.rois.ac.jp/kmnist/index.html.en">[8] KMNIST Dataset</a><br>
+
+
+
+
+
+      <br><br>
+
+      <hr>
+      <footer>
+        <b>Template credits:</b> <a href="https://filebox.ece.vt.edu/~F15ECE5554ECE4984/resources/final_webpage.zip">link</a>
+
+        <p>© Georgia Tech - CS6476 - Computer Vision</p>
+      </footer>
+    </div>
+  </div>
+
+  <br><br>
+
+</body></html>
